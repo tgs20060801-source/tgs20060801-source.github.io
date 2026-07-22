@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多模型融合的房价预测研究 - 谭sir的个人网站</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html">首页</a>
+        <a href="about.html">关于我</a>
+        <a href="projects.html">我的项目</a>
+        <a href="contact.html">联系我</a>
+        <a href="login.html">注册 / 登录</a>
+        <button class="theme-toggle" type="button" onclick="toggleTheme()" id="themeToggle" aria-label="切换深色模式">
+            🌙 深色模式
+        </button>
+    </nav>
+
+    <article class="project-detail">
+        <section class="project-hero">
+            <h2>多模型融合的房价预测研究</h2>
+            <p>本项目围绕 Ames Housing 数据集开展了一个完整的监督学习回归任务研究，重点比较了多个传统回归模型与树模型的预测能力，并通过加权融合构建更稳定的房价预测系统。</p>
+            <div class="project-tags">
+                <span>Python</span>
+                <span>Scikit-learn</span>
+                <span>回归分析</span>
+                <span>特征工程</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-label">融合模型 RMSE</span>
+                    <span class="metric-value">24283.68</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">融合模型 R²</span>
+                    <span class="metric-value">0.9231</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">融合模型 MAE</span>
+                    <span class="metric-value">15114.53</span>
+                </div>
+            </div>
+            <a class="button-link" href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub 代码链接</a>
+            <a class="button-link secondary" href="#" target="_blank" rel="noopener noreferrer">项目报告下载</a>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目概述</h3>
+            <p>该项目以 Ames Housing 为实验数据，构建了房价回归预测 pipeline，系统比较了线性模型和树模型在房地产价格预测任务中的表现，并通过模型融合得到更稳健的结果。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>数据集介绍</h3>
+            <p>使用的公开房价数据集包含 1460 条训练样本和 1459 条测试样本，目标变量为 SalePrice。数据中既包含连续型特征，也包含大量类别型特征，具备典型的真实房屋交易数据特征。</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>内容</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>数据集</td>
+                        <td>Ames Housing</td>
+                    </tr>
+                    <tr>
+                        <td>任务类型</td>
+                        <td>监督学习回归任务</td>
+                    </tr>
+                    <tr>
+                        <td>训练集</td>
+                        <td>1460 条样本</td>
+                    </tr>
+                    <tr>
+                        <td>测试集</td>
+                        <td>1459 条样本</td>
+                    </tr>
+                    <tr>
+                        <td>预测目标</td>
+                        <td>SalePrice</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="detail-section">
+            <h3>数据预处理流程</h3>
+            <ul class="detail-list">
+                <li>缺失值处理</li>
+                <li>IQR 异常值处理</li>
+                <li>类别变量 One-Hot 编码</li>
+                <li>StandardScaler 标准化</li>
+                <li>低方差特征筛选</li>
+                <li>log1p 目标变量变换，缓解房价分布右偏问题</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>特征工程</h3>
+            <p>通过结合原始字段与人工衍生特征，构造更适合模型学习的输入空间。同时对特征工程的稳定性进行讨论，发现并非所有人工特征都会稳定提升所有模型的表现。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>模型对比</h3>
+            <ul class="detail-list">
+                <li>Linear Regression</li>
+                <li>RidgeCV</li>
+                <li>LassoCV</li>
+                <li>ElasticNetCV</li>
+                <li>Random Forest</li>
+                <li>Gradient Boosting</li>
+            </ul>
+            <p>其中 RidgeCV 验证集 RMSE 为 25567.84，Gradient Boosting 验证集 RMSE 为 25555.43，说明两类模型在不同结构上各具优势。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>模型融合方法</h3>
+            <p>采用 RidgeCV 与 Gradient Boosting 的加权融合策略，最终融合权重设为 0.5：0.5。实验表明，融合模型在验证集上综合表现优于单一模型。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>最终指标</h3>
+            <ul class="detail-list">
+                <li>融合模型 RMSE：24283.68</li>
+                <li>融合模型 MAE：15114.53</li>
+                <li>融合模型 R²：0.9231</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>关键特征分析</h3>
+            <p>通过特征重要性分析发现，OverallQual、GrLivArea 和 TotalBsmtSF 是影响房价预测结果最关键的几个特征，说明房屋整体质量和面积相关变量在该任务中最具解释力。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目结论</h3>
+            <ul class="detail-list">
+                <li>log1p 目标变量变换明显改善了房价右偏问题。</li>
+                <li>RidgeCV 更擅长学习整体线性关系。</li>
+                <li>Gradient Boosting 更擅长学习非线性关系。</li>
+                <li>模型融合后预测效果优于单一模型。</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目局限性</h3>
+            <p>尽管融合模型取得了较好的效果，但人工衍生特征并不一定对所有模型都稳定提升，且模型在极端房价样本上的预测仍有提升空间。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>图片展示区域</h3>
+            <div class="image-grid">
+                <div class="image-card">
+                    <h4>房价分布变换图</h4>
+                    <div class="image-placeholder">房价分布变换图占位</div>
+                </div>
+                <div class="image-card">
+                    <h4>模型性能对比图</h4>
+                    <div class="image-placeholder">模型性能对比图占位</div>
+                </div>
+                <div class="image-card">
+                    <h4>特征重要性图</h4>
+                    <div class="image-placeholder">特征重要性图占位</div>
+                </div>
+                <div class="image-card">
+                    <h4>真实值与预测值图</h4>
+                    <div class="image-placeholder">真实值与预测值图占位</div>
+                </div>
+                <div class="image-card">
+                    <h4>残差分布图</h4>
+                    <div class="image-placeholder">残差分布图占位</div>
+                </div>
+            </div>
+        </section>
+    </article>
+
+    <script src="script.js"></script>
+</body>
+</html>
