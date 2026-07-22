@@ -1,10 +1,9 @@
 const SUPABASE_URL = "https://imokmchcmeuctrmamjrr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Qn1qno4S-tYe94i-G00wGA_gtVxK3V9";
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-);
+const supabaseClient = typeof supabase !== "undefined"
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+    : null;
 
 function applyTheme(theme) {
     document.body.classList.toggle("dark-mode", theme === "dark");
@@ -64,6 +63,14 @@ function getAuthInput() {
 }
 
 async function registerUser() {
+    if (!supabaseClient) {
+        const message = document.getElementById("authMessage");
+        if (message) {
+            message.textContent = "当前无法连接到认证服务。";
+        }
+        return;
+    }
+
     const input = getAuthInput();
 
     if (!input) {
@@ -101,6 +108,14 @@ async function registerUser() {
 }
 
 async function loginUser() {
+    if (!supabaseClient) {
+        const message = document.getElementById("authMessage");
+        if (message) {
+            message.textContent = "当前无法连接到认证服务。";
+        }
+        return;
+    }
+
     const input = getAuthInput();
 
     if (!input) {
@@ -129,6 +144,14 @@ async function loginUser() {
 }
 
 async function logoutUser() {
+    if (!supabaseClient) {
+        const message = document.getElementById("authMessage");
+        if (message) {
+            message.textContent = "当前无法连接到认证服务。";
+        }
+        return;
+    }
+
     const message = document.getElementById("authMessage");
     message.textContent = "正在退出……";
 
@@ -162,6 +185,10 @@ async function updateAuthStatus() {
         return;
     }
 
+    if (!supabaseClient) {
+        return;
+    }
+
     const { data, error } = await supabaseClient.auth.getSession();
 
     if (error) {
@@ -190,7 +217,7 @@ const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 applyTheme(savedTheme || (prefersDark ? "dark" : "light"));
 
-if (window.supabase && document.getElementById("authEmail")) {
+if (supabaseClient && document.getElementById("authEmail")) {
     supabaseClient.auth.onAuthStateChange(() => {
         updateAuthStatus();
     });
