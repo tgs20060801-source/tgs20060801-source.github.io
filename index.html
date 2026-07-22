@@ -16,11 +16,46 @@
             scroll-behavior: smooth;
         }
 
+        :root {
+            --bg-color: #f2f4f7;
+            --surface-color: #ffffff;
+            --surface-alt: #f7f9fc;
+            --text-color: #222;
+            --muted-color: #666;
+            --primary-color: #1677ff;
+            --primary-hover: #0958d9;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --navbar-text: #333;
+            --border-color: #ccc;
+            --skill-bg: #e6f4ff;
+            --skill-text: #1677ff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color-strong: rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode {
+            --bg-color: #0f1724;
+            --surface-color: #171d2b;
+            --surface-alt: #23283a;
+            --text-color: #f3f6fb;
+            --muted-color: #b7c0cc;
+            --primary-color: #5b8cff;
+            --primary-hover: #3d6ef0;
+            --navbar-bg: rgba(15, 23, 36, 0.95);
+            --navbar-text: #f3f6fb;
+            --border-color: #3e4758;
+            --skill-bg: #20324f;
+            --skill-text: #97bfff;
+            --shadow-color: rgba(0, 0, 0, 0.35);
+            --shadow-color-strong: rgba(0, 0, 0, 0.25);
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f2f4f7;
-            color: #222;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .navbar {
@@ -29,20 +64,20 @@
             z-index: 1000;
             padding: 18px;
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            background-color: var(--navbar-bg);
+            box-shadow: 0 2px 15px var(--shadow-color-strong);
         }
 
         .navbar a {
             margin: 0 18px;
-            color: #333;
+            color: var(--navbar-text);
             font-size: 16px;
             font-weight: bold;
             text-decoration: none;
         }
 
         .navbar a:hover {
-            color: #1677ff;
+            color: var(--primary-color);
         }
 
         .container,
@@ -53,9 +88,9 @@
             max-width: 800px;
             margin: 80px auto 100px;
             padding: 40px;
-            background-color: white;
+            background-color: var(--surface-color);
             border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 30px var(--shadow-color);
         }
 
         .container {
@@ -75,7 +110,7 @@
         .avatar {
             width: 150px;
             height: 150px;
-            border: 4px solid #1677ff;
+            border: 4px solid var(--primary-color);
             border-radius: 50%;
             object-fit: cover;
         }
@@ -91,7 +126,7 @@
         }
 
         p {
-            color: #666;
+            color: var(--muted-color);
             font-size: 18px;
             line-height: 1.7;
         }
@@ -102,13 +137,31 @@
             border: none;
             border-radius: 8px;
             color: white;
-            background-color: #1677ff;
+            background-color: var(--primary-color);
             font-size: 16px;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #0958d9;
+            background-color: var(--primary-hover);
+        }
+
+        .theme-toggle {
+            margin-left: 14px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background-color: var(--surface-alt);
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .theme-toggle:hover {
+            color: white;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .skills {
@@ -120,8 +173,8 @@
             margin: 6px;
             padding: 8px 16px;
             border-radius: 20px;
-            color: #1677ff;
-            background-color: #e6f4ff;
+            color: var(--skill-text);
+            background-color: var(--skill-bg);
             font-size: 15px;
         }
 
@@ -129,13 +182,13 @@
             margin-top: 20px;
             padding: 20px;
             border-radius: 12px;
-            background-color: #f7f9fc;
+            background-color: var(--surface-alt);
             text-align: left;
         }
 
         .project-card h3 {
             margin-top: 0;
-            color: #1677ff;
+            color: var(--primary-color);
         }
 
         .project-card p {
@@ -143,7 +196,7 @@
         }
 
         .contact a {
-            color: #1677ff;
+            color: var(--primary-color);
             font-weight: bold;
             text-decoration: none;
         }
@@ -158,8 +211,8 @@
             margin: 0 auto 100px;
             padding: 40px;
             border-radius: 16px;
-            background-color: white;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            background-color: var(--surface-color);
+            box-shadow: 0 8px 30px var(--shadow-color);
             text-align: center;
         }
 
@@ -168,9 +221,15 @@
             width: 100%;
             margin: 14px 0;
             padding: 13px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 16px;
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .auth input::placeholder {
+            color: var(--muted-color);
         }
 
         .auth-buttons {
@@ -187,8 +246,16 @@
             background-color: #555;
         }
 
+        body.dark-mode #logoutButton {
+            background-color: #707a89;
+        }
+
         #logoutButton:hover {
             background-color: #333;
+        }
+
+        body.dark-mode #logoutButton:hover {
+            background-color: #5a6472;
         }
 
         #authMessage {
@@ -206,6 +273,10 @@
                 display: inline-block;
                 margin: 5px 7px;
                 font-size: 14px;
+            }
+
+            .theme-toggle {
+                margin: 8px 0 0;
             }
 
             .container,
@@ -261,6 +332,9 @@
         <a href="#projects">我的项目</a>
         <a href="#contact">联系我</a>
         <a href="#auth">注册 / 登录</a>
+        <button class="theme-toggle" type="button" onclick="toggleTheme()" id="themeToggle" aria-label="切换深色模式">
+            🌙 深色模式
+        </button>
     </nav>
 
     <div class="container" id="home">
@@ -369,6 +443,32 @@
             SUPABASE_URL,
             SUPABASE_PUBLISHABLE_KEY
         );
+
+        function applyTheme(theme) {
+            document.body.classList.toggle("dark-mode", theme === "dark");
+
+            const themeToggle = document.getElementById("themeToggle");
+            if (themeToggle) {
+                themeToggle.textContent = theme === "dark"
+                    ? "☀️ 浅色模式"
+                    : "🌙 深色模式";
+                themeToggle.setAttribute(
+                    "aria-label",
+                    theme === "dark"
+                        ? "切换为浅色模式"
+                        : "切换为深色模式"
+                );
+            }
+        }
+
+        function toggleTheme() {
+            const nextTheme = document.body.classList.contains("dark-mode")
+                ? "light"
+                : "dark";
+
+            localStorage.setItem("theme", nextTheme);
+            applyTheme(nextTheme);
+        }
 
         function showMessage() {
             document.getElementById("about").scrollIntoView({
@@ -547,6 +647,11 @@
                 authButtons.hidden = false;
             }
         }
+
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        applyTheme(savedTheme || (prefersDark ? "dark" : "light"));
 
         supabaseClient.auth.onAuthStateChange(() => {
             updateAuthStatus();
