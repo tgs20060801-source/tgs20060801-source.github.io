@@ -8,120 +8,19 @@
     <title>谭sir的个人网站</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f2f4f7;
             color: #222;
-        }
-
-        .container {
-            width: 80%;
-            max-width: 800px;
-            margin: 100px auto;
-            padding: 40px;
-            text-align: center;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #1677ff;
-        }
-
-        h1 {
-            font-size: 42px;
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 18px;
-            color: #666;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            font-size: 16px;
-            color: white;
-            background-color: #1677ff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0958d9;
-        }
-
-        .about {
-            width: 80%;
-            max-width: 800px;
-            margin: 0 auto 100px;
-            padding: 40px;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .about h2 {
-            font-size: 30px;
-            margin-top: 0;
-        }
-
-        .skills {
-            margin-top: 25px;
-        }
-
-        .skills span {
-            display: inline-block;
-            margin: 6px;
-            padding: 8px 16px;
-            background-color: #e6f4ff;
-            color: #1677ff;
-            border-radius: 20px;
-            font-size: 15px;
-        }
-
-        .projects {
-            width: 80%;
-            max-width: 800px;
-            margin: 0 auto 100px;
-            padding: 40px;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .projects h2 {
-            font-size: 30px;
-            margin-top: 0;
-        }
-
-        .project-card {
-            margin-top: 20px;
-            padding: 20px;
-            text-align: left;
-            background-color: #f7f9fc;
-            border-radius: 12px;
-        }
-
-        .project-card h3 {
-            margin-top: 0;
-            color: #1677ff;
-        }
-
-        .project-card p {
-            margin-bottom: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         .navbar {
@@ -146,20 +45,101 @@
             color: #1677ff;
         }
 
+        .container,
+        .about,
+        .projects,
         .contact {
             width: 80%;
             max-width: 800px;
-            margin: 0 auto 100px;
+            margin: 80px auto 100px;
             padding: 40px;
-            text-align: center;
             background-color: white;
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .contact h2 {
+        .container {
+            text-align: center;
+        }
+
+        .about,
+        .projects,
+        .contact {
+            margin-top: 0;
+        }
+
+        .contact {
+            text-align: center;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border: 4px solid #1677ff;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 42px;
+        }
+
+        h2 {
             margin-top: 0;
             font-size: 30px;
+        }
+
+        p {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            background-color: #1677ff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0958d9;
+        }
+
+        .skills {
+            margin-top: 25px;
+        }
+
+        .skills span {
+            display: inline-block;
+            margin: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #1677ff;
+            background-color: #e6f4ff;
+            font-size: 15px;
+        }
+
+        .project-card {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #f7f9fc;
+            text-align: left;
+        }
+
+        .project-card h3 {
+            margin-top: 0;
+            color: #1677ff;
+        }
+
+        .project-card p {
+            margin-bottom: 0;
         }
 
         .contact a {
@@ -171,7 +151,106 @@
         .contact a:hover {
             text-decoration: underline;
         }
+
+        .auth {
+            width: 80%;
+            max-width: 500px;
+            margin: 0 auto 100px;
+            padding: 40px;
+            border-radius: 16px;
+            background-color: white;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .auth input {
+            display: block;
+            width: 100%;
+            margin: 14px 0;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .auth-buttons button {
+            flex: 1;
+        }
+
+        #logoutButton {
+            width: 100%;
+            background-color: #555;
+        }
+
+        #logoutButton:hover {
+            background-color: #333;
+        }
+
+        #authMessage {
+            min-height: 24px;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                padding: 10px 5px;
+            }
+
+            .navbar a {
+                display: inline-block;
+                margin: 5px 7px;
+                font-size: 14px;
+            }
+
+            .container,
+            .about,
+            .projects,
+            .contact,
+            .auth {
+                width: calc(100% - 24px);
+                margin-bottom: 30px;
+                padding: 24px 18px;
+            }
+
+            .container {
+                margin-top: 30px;
+            }
+
+            .avatar {
+                width: 110px;
+                height: 110px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            h2 {
+                font-size: 25px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .auth-buttons button {
+                width: 100%;
+            }
+        }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -181,18 +260,21 @@
         <a href="#about">关于我</a>
         <a href="#projects">我的项目</a>
         <a href="#contact">联系我</a>
+        <a href="#auth">注册 / 登录</a>
     </nav>
 
     <div class="container" id="home">
         <img src="avatar.jpg" alt="谭sir的头像" class="avatar">
+
         <h1>你好，我是谭sir</h1>
 
         <p>欢迎来到谭sir的个人空间！</p>
 
         <p>我正在学习 Python、数据分析和网站开发。</p>
 
-        <button onclick="showMessage()">点击认识我</button>
+        <button type="button" onclick="showMessage()">点击认识我</button>
     </div>
+
     <section class="about" id="about">
         <h2>关于我</h2>
 
@@ -208,11 +290,13 @@
             <span>网站开发</span>
         </div>
     </section>
+
     <section class="projects" id="projects">
         <h2>我的项目</h2>
 
         <div class="project-card">
             <h3>个人网站</h3>
+
             <p>
                 使用 HTML、CSS 和 JavaScript 制作的个人主页，
                 包含个人介绍、技能展示和交互功能。
@@ -221,6 +305,7 @@
 
         <div class="project-card">
             <h3>Python 数据分析</h3>
+
             <p>
                 使用 Python 对数据进行整理、分析和可视化，
                 并尝试建立简单的机器学习模型。
@@ -239,12 +324,235 @@
         </p>
     </section>
 
+    <section class="auth" id="auth">
+        <h2>用户中心</h2>
+
+        <input
+            type="email"
+            id="authEmail"
+            placeholder="请输入邮箱"
+            autocomplete="email"
+        >
+
+        <input
+            type="password"
+            id="authPassword"
+            placeholder="请输入密码，至少 6 位"
+            autocomplete="current-password"
+        >
+
+        <div class="auth-buttons">
+            <button type="button" onclick="registerUser()">注册</button>
+            <button type="button" onclick="loginUser()">登录</button>
+        </div>
+
+        <button
+            type="button"
+            id="logoutButton"
+            onclick="logoutUser()"
+            hidden
+        >
+            退出登录
+        </button>
+
+        <p id="authMessage"></p>
+    </section>
+
     <script>
+        const SUPABASE_URL =
+            "https://imokmchcmeuctrmamjrr.supabase.co";
+
+        const SUPABASE_PUBLISHABLE_KEY =
+            "sb_publishable_Qn1qno4S-tYe94i-G00wGA_gtVxK3V9";
+
+        const supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
+
         function showMessage() {
             document.getElementById("about").scrollIntoView({
                 behavior: "smooth"
             });
         }
+
+        function getAuthInput() {
+            const emailInput = document.getElementById("authEmail");
+            const passwordInput = document.getElementById("authPassword");
+            const message = document.getElementById("authMessage");
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            message.textContent = "";
+
+            if (!email || !password) {
+                message.textContent = "请完整填写邮箱和密码。";
+                return null;
+            }
+
+            if (password.length < 6) {
+                message.textContent = "密码至少需要 6 位。";
+                return null;
+            }
+
+            return {
+                email,
+                password,
+                message
+            };
+        }
+
+        async function registerUser() {
+            const input = getAuthInput();
+
+            if (!input) {
+                return;
+            }
+
+            input.message.textContent = "正在注册……";
+
+            try {
+                const { data, error } =
+                    await supabaseClient.auth.signUp({
+                        email: input.email,
+                        password: input.password,
+                        options: {
+    emailRedirectTo:
+        "https://tgs20060801-source.github.io/"
+}
+                    });
+
+                if (error) {
+                    input.message.textContent =
+                        "注册失败：" + error.message;
+                    return;
+                }
+
+                if (data.session) {
+                    input.message.textContent =
+                        "注册成功，并已登录。";
+                } else {
+                    input.message.textContent =
+                        "注册成功，请前往邮箱完成验证。";
+                }
+
+                document.getElementById("authPassword").value = "";
+                await updateAuthStatus();
+            } catch (error) {
+                input.message.textContent =
+                    "注册过程中出现错误，请稍后重试。";
+
+                console.error(error);
+            }
+        }
+
+        async function loginUser() {
+            const input = getAuthInput();
+
+            if (!input) {
+                return;
+            }
+
+            input.message.textContent = "正在登录……";
+
+            try {
+                const { error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: input.email,
+                        password: input.password
+                    });
+
+                if (error) {
+                    input.message.textContent =
+                        "登录失败：" + error.message;
+                    return;
+                }
+
+                document.getElementById("authPassword").value = "";
+                await updateAuthStatus();
+            } catch (error) {
+                input.message.textContent =
+                    "登录过程中出现错误，请稍后重试。";
+
+                console.error(error);
+            }
+        }
+
+        async function logoutUser() {
+            const message = document.getElementById("authMessage");
+
+            message.textContent = "正在退出……";
+
+            try {
+                const { error } =
+                    await supabaseClient.auth.signOut();
+
+                if (error) {
+                    message.textContent =
+                        "退出失败：" + error.message;
+                    return;
+                }
+
+                document.getElementById("authEmail").value = "";
+                document.getElementById("authPassword").value = "";
+
+                await updateAuthStatus();
+                message.textContent = "已经退出登录。";
+            } catch (error) {
+                message.textContent =
+                    "退出过程中出现错误，请稍后重试。";
+
+                console.error(error);
+            }
+        }
+
+        async function updateAuthStatus() {
+            const message = document.getElementById("authMessage");
+            const logoutButton =
+                document.getElementById("logoutButton");
+
+            const emailInput =
+                document.getElementById("authEmail");
+
+            const passwordInput =
+                document.getElementById("authPassword");
+
+            const authButtons =
+                document.querySelector(".auth-buttons");
+
+            const { data, error } =
+                await supabaseClient.auth.getSession();
+
+            if (error) {
+                message.textContent =
+                    "读取登录状态失败：" + error.message;
+                return;
+            }
+
+            const session = data.session;
+
+            if (session) {
+                logoutButton.hidden = false;
+                emailInput.disabled = true;
+                passwordInput.disabled = true;
+                authButtons.hidden = true;
+
+                message.textContent =
+                    "当前已登录：" + session.user.email;
+            } else {
+                logoutButton.hidden = true;
+                emailInput.disabled = false;
+                passwordInput.disabled = false;
+                authButtons.hidden = false;
+            }
+        }
+
+        supabaseClient.auth.onAuthStateChange(() => {
+            updateAuthStatus();
+        });
+
+        updateAuthStatus();
     </script>
 
 </body>
