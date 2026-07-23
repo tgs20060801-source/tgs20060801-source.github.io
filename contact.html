@@ -25,21 +25,21 @@
         <p>欢迎和我交流编程、数据分析以及数学建模。</p>
         <p>邮箱：<a href="mailto:2796753954@qq.com">2796753954@qq.com</a></p>
 
-        <div style="margin-top: 28px; padding: 20px; border: 1px solid #d0d7de; border-radius: 12px; background: rgba(255,255,255,0.85); max-width: 720px;">
-            <h3 style="margin-top: 0; margin-bottom: 16px;">留言板</h3>
+        <div class="comment-board">
+            <h3 class="comment-board-title">留言板</h3>
 
-            <form id="commentForm" style="display: grid; gap: 12px;">
-                <label for="commentName" style="font-weight: 600;">昵称</label>
-                <input id="commentName" type="text" placeholder="请输入昵称" maxlength="50" required style="padding: 10px 12px; border: 1px solid #c7d2e0; border-radius: 8px;">
+            <form id="commentForm" class="comment-form">
+                <label class="comment-label" for="commentName">昵称</label>
+                <input id="commentName" class="comment-input" type="text" placeholder="请输入昵称" maxlength="50" required>
 
-                <label for="commentMessage" style="font-weight: 600;">留言内容</label>
-                <textarea id="commentMessage" rows="5" placeholder="写下你的留言..." maxlength="500" required style="padding: 10px 12px; border: 1px solid #c7d2e0; border-radius: 8px; resize: vertical;"></textarea>
+                <label class="comment-label" for="commentMessage">留言内容</label>
+                <textarea id="commentMessage" class="comment-textarea" rows="5" placeholder="写下你的留言..." maxlength="500" required></textarea>
 
-                <button type="submit" style="padding: 10px 16px; border: none; border-radius: 8px; background: #1f6feb; color: #fff; cursor: pointer; width: fit-content;">提交留言</button>
-                <p id="commentStatus" style="margin: 0; min-height: 1.5em;"></p>
+                <button type="submit" class="comment-submit">提交留言</button>
+                <p id="commentStatus" class="comment-status"></p>
             </form>
 
-            <div id="commentsList" style="margin-top: 24px; display: grid; gap: 12px;"></div>
+            <div id="commentsList" class="comments-list"></div>
         </div>
     </section>
 

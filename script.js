@@ -293,20 +293,42 @@ function renderComments(comments) {
         return;
     }
 
+    commentsList.innerHTML = "";
+
     if (!comments || comments.length === 0) {
-        commentsList.innerHTML = "<p>目前还没有留言，快来留下一句吧。</p>";
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "comment-content";
+        emptyMessage.textContent = "目前还没有留言，快来留下一句吧。";
+        commentsList.appendChild(emptyMessage);
         return;
     }
 
-    commentsList.innerHTML = comments.map((comment) => `
-        <article style="padding: 14px; border: 1px solid #d0d7de; border-radius: 10px; background: rgba(255,255,255,0.72);">
-            <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 8px;">
-                <strong>${comment.name || "匿名用户"}</strong>
-                <span style="color: #6b7280; font-size: 0.9em;">${formatCommentTime(comment.created_at)}</span>
-            </div>
-            <p style="margin: 0; white-space: pre-wrap;">${comment.message || ""}</p>
-        </article>
-    `).join("");
+    comments.forEach((comment) => {
+        const card = document.createElement("article");
+        card.className = "comment-card";
+
+        const meta = document.createElement("div");
+        meta.className = "comment-meta";
+
+        const author = document.createElement("div");
+        author.className = "comment-author";
+        author.textContent = comment.name || "匿名用户";
+
+        const time = document.createElement("div");
+        time.className = "comment-time";
+        time.textContent = formatCommentTime(comment.created_at);
+
+        meta.appendChild(author);
+        meta.appendChild(time);
+
+        const content = document.createElement("p");
+        content.className = "comment-content";
+        content.textContent = comment.message || "";
+
+        card.appendChild(meta);
+        card.appendChild(content);
+        commentsList.appendChild(card);
+    });
 }
 
 async function loadComments() {
@@ -345,13 +367,14 @@ async function submitComment(event) {
     const nameInput = document.getElementById("commentName");
     const messageInput = document.getElementById("commentMessage");
     const statusElement = document.getElementById("commentStatus");
+    const submitButton = form?.querySelector("button[type='submit']");
 
     if (!form || !nameInput || !messageInput || !statusElement) {
         return;
     }
 
     if (!supabaseClient) {
-        statusElement.textContent = "当前无法连接到留言服务。";
+        statusElement.textContent = "❌ 当前无法连接到留言服务。";
         return;
     }
 
@@ -359,11 +382,16 @@ async function submitComment(event) {
     const message = messageInput.value.trim();
 
     if (!name || !message) {
-        statusElement.textContent = "昵称和留言内容都不能为空。";
+        statusElement.textContent = "❌ 昵称和留言内容都不能为空。";
         return;
     }
 
-    statusElement.textContent = "正在提交留言……";
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "提交中...";
+    }
+
+    statusElement.textContent = "";
 
     try {
         const { error } = await supabaseClient
@@ -380,11 +408,16 @@ async function submitComment(event) {
         }
 
         form.reset();
-        statusElement.textContent = "留言提交成功！";
+        statusElement.textContent = "✅ 留言成功！";
         await loadComments();
     } catch (error) {
         console.error("提交留言失败：", error);
-        statusElement.textContent = "留言提交失败，请稍后重试。";
+        statusElement.textContent = "❌ 留言失败，请稍后重试";
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "提交留言";
+        }
     }
 }
 
