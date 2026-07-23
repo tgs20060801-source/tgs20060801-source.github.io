@@ -5,6 +5,61 @@ const supabaseClient = typeof supabase !== "undefined"
     ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
     : null;
 
+async function insertVisitorRecord() {
+    if (!supabaseClient) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from("visitors")
+            .insert([
+                {
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+        if (error) {
+            console.error("访问记录写入失败：", error);
+        }
+    } catch (error) {
+        console.error("访问记录写入失败：", error);
+    }
+}
+
+async function updateVisitorCount() {
+    const visitorCountElement = document.getElementById("visitorCount");
+
+    if (!visitorCountElement) {
+        return;
+    }
+
+    if (!supabaseClient) {
+        visitorCountElement.textContent = "本站访问人数：--";
+        return;
+    }
+
+    try {
+        const { count, error } = await supabaseClient
+            .from("visitors")
+            .select("*", { count: "exact", head: true });
+
+        if (error) {
+            throw error;
+        }
+
+        visitorCountElement.textContent = `本站访问人数：${count ?? 0}`;
+    } catch (error) {
+        console.error("访问人数查询失败：", error);
+        visitorCountElement.textContent = "本站访问人数：--";
+    }
+}
+
+async function initVisitorStats() {
+    await insertVisitorRecord();
+    await updateVisitorCount();
+}
+
 function applyTheme(theme) {
     document.body.classList.toggle("dark-mode", theme === "dark");
 
@@ -216,6 +271,10 @@ const savedTheme = localStorage.getItem("theme");
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 applyTheme(savedTheme || (prefersDark ? "dark" : "light"));
+
+if (supabaseClient) {
+    initVisitorStats();
+}
 
 if (supabaseClient && document.getElementById("authEmail")) {
     supabaseClient.auth.onAuthStateChange(() => {
