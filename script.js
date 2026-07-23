@@ -118,10 +118,12 @@ function showMessage() {
 }
 
 function getAuthInput() {
+    const nicknameInput = document.getElementById("authNickname");
     const emailInput = document.getElementById("authEmail");
     const passwordInput = document.getElementById("authPassword");
     const message = document.getElementById("authMessage");
 
+    const nickname = nicknameInput ? nicknameInput.value.trim() : "";
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
@@ -138,6 +140,7 @@ function getAuthInput() {
     }
 
     return {
+        nickname,
         email,
         password,
         message
@@ -159,6 +162,11 @@ async function registerUser() {
         return;
     }
 
+    if (document.getElementById("authNickname") && !input.nickname) {
+        input.message.textContent = "请填写昵称。";
+        return;
+    }
+
     input.message.textContent = "正在注册……";
 
     try {
@@ -175,12 +183,33 @@ async function registerUser() {
             return;
         }
 
+        if (data.user) {
+            const { error: profileError } = await supabaseClient
+                .from("profiles")
+                .upsert([
+                    {
+                        id: data.user.id,
+                        email: input.email,
+                        nickname: input.nickname,
+                        role: "user"
+                    }
+                ], {
+                    onConflict: "id"
+                });
+
+            if (profileError) {
+                console.error("插入 profile 失败：", profileError);
+            }
+        }
+
         if (data.session) {
             input.message.textContent = "注册成功，并已登录。";
         } else {
             input.message.textContent = "注册成功，请前往邮箱完成验证。";
         }
 
+        document.getElementById("authNickname").value = "";
+        document.getElementById("authEmail").value = "";
         document.getElementById("authPassword").value = "";
         await updateAuthStatus();
     } catch (error) {
@@ -217,8 +246,13 @@ async function loginUser() {
             return;
         }
 
+        input.message.textContent = "✅ 登录成功，欢迎回来！";
         document.getElementById("authPassword").value = "";
         await updateAuthStatus();
+
+        window.setTimeout(() => {
+            window.location.href = "profile.html";
+        }, 1000);
     } catch (error) {
         input.message.textContent = "登录过程中出现错误，请稍后重试。";
         console.error(error);
@@ -227,31 +261,55 @@ async function loginUser() {
 
 async function logoutUser() {
     if (!supabaseClient) {
-        const message = document.getElementById("authMessage");
+        const message = document.getElementById("authMessage") || document.getElementById("profileMessage");
         if (message) {
             message.textContent = "当前无法连接到认证服务。";
         }
         return;
     }
 
-    const message = document.getElementById("authMessage");
-    message.textContent = "正在退出……";
+    const message = document.getElementById("authMessage") || document.getElementById("profileMessage");
+    if (message) {
+        message.textContent = "正在退出……";
+    }
 
     try {
         const { error } = await supabaseClient.auth.signOut();
 
         if (error) {
-            message.textContent = "退出失败：" + error.message;
+            if (message) {
+                message.textContent = "退出失败：" + error.message;
+            }
             return;
         }
 
-        document.getElementById("authEmail").value = "";
-        document.getElementById("authPassword").value = "";
+        const emailInput = document.getElementById("authEmail");
+        const passwordInput = document.getElementById("authPassword");
+        const nicknameInput = document.getElementById("authNickname");
+
+        if (emailInput) {
+            emailInput.value = "";
+        }
+        if (passwordInput) {
+            passwordInput.value = "";
+        }
+        if (nicknameInput) {
+            nicknameInput.value = "";
+        }
+
+        if (window.location.pathname.endsWith("profile.html")) {
+            window.location.href = "login.html";
+            return;
+        }
 
         await updateAuthStatus();
-        message.textContent = "已经退出登录。";
+        if (message) {
+            message.textContent = "已经退出登录。";
+        }
     } catch (error) {
-        message.textContent = "退出过程中出现错误，请稍后重试。";
+        if (message) {
+            message.textContent = "退出过程中出现错误，请稍后重试。";
+        }
         console.error(error);
     }
 }
@@ -261,6 +319,7 @@ async function updateAuthStatus() {
     const logoutButton = document.getElementById("logoutButton");
     const emailInput = document.getElementById("authEmail");
     const passwordInput = document.getElementById("authPassword");
+    const nicknameInput = document.getElementById("authNickname");
     const authButtons = document.querySelector(".auth-buttons");
 
     if (!message || !logoutButton || !emailInput || !passwordInput || !authButtons) {
@@ -284,12 +343,18 @@ async function updateAuthStatus() {
         logoutButton.hidden = false;
         emailInput.disabled = true;
         passwordInput.disabled = true;
+        if (nicknameInput) {
+            nicknameInput.disabled = true;
+        }
         authButtons.hidden = true;
         message.textContent = "当前已登录：" + session.user.email;
     } else {
         logoutButton.hidden = true;
         emailInput.disabled = false;
         passwordInput.disabled = false;
+        if (nicknameInput) {
+            nicknameInput.disabled = false;
+        }
         authButtons.hidden = false;
     }
 }
@@ -341,6 +406,88 @@ async function detectAdminUser() {
         isAdmin = false;
         console.log("isAdmin:", isAdmin);
         return false;
+    }
+}
+
+function formatUserDate(value) {
+    if (!value) {
+        return "未知时间";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return "未知时间";
+    }
+
+    return new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(date);
+}
+
+async function loadCurrentUserProfile() {
+    const profileAvatar = document.getElementById("profileAvatar");
+    const profileNickname = document.getElementById("profileNickname");
+    const profileEmail = document.getElementById("profileEmail");
+    const profileCreatedAt = document.getElementById("profileCreatedAt");
+    const profileMessage = document.getElementById("profileMessage");
+
+    if (!profileAvatar || !profileNickname || !profileEmail || !profileCreatedAt) {
+        return;
+    }
+
+    if (!supabaseClient) {
+        if (profileMessage) {
+            profileMessage.textContent = "当前无法连接到用户服务。";
+        }
+        return;
+    }
+
+    try {
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+        if (userError || !userData?.user) {
+            if (profileMessage) {
+                profileMessage.textContent = "请先登录后查看个人主页。";
+            }
+            return;
+        }
+
+        const user = userData.user;
+
+        const { data: profileData, error: profileError } = await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileError) {
+            throw profileError;
+        }
+
+        const profile = profileData || {};
+        const nickname = profile.nickname || user.email || "用户";
+        const email = profile.email || user.email || "未知邮箱";
+        const avatarUrl = profile.avatar_url || "./avatar.jpg";
+        const createdAt = user.created_at || profile.created_at || "";
+
+        profileAvatar.src = avatarUrl;
+        profileAvatar.alt = nickname;
+        profileNickname.textContent = nickname;
+        profileEmail.textContent = email;
+        profileCreatedAt.textContent = `注册时间：${formatUserDate(createdAt)}`;
+
+        if (profileMessage) {
+            profileMessage.textContent = "";
+        }
+    } catch (error) {
+        console.error("读取个人资料失败：", error);
+        if (profileMessage) {
+            profileMessage.textContent = "个人资料加载失败，请稍后重试。";
+        }
     }
 }
 
@@ -596,4 +743,8 @@ const commentForm = document.getElementById("commentForm");
 if (commentForm) {
     commentForm.addEventListener("submit", submitComment);
     loadComments();
+}
+
+if (document.getElementById("profileAvatar")) {
+    loadCurrentUserProfile();
 }

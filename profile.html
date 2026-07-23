@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册 / 登录 - 谭sir的个人网站</title>
+    <title>个人主页 - 谭sir的个人网站</title>
     <link rel="stylesheet" href="./styles.css">
     <script defer src="https://cloud.umami.is/script.js" data-website-id="d7a13b04-1505-419a-add0-85c84ff18758"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,37 +20,15 @@
         </button>
     </nav>
 
-    <section class="auth">
-        <h2>用户中心</h2>
-
-        <input
-            type="text"
-            id="authNickname"
-            placeholder="请输入昵称"
-            autocomplete="nickname"
-        >
-
-        <input
-            type="email"
-            id="authEmail"
-            placeholder="请输入邮箱"
-            autocomplete="email"
-        >
-
-        <input
-            type="password"
-            id="authPassword"
-            placeholder="请输入密码，至少 6 位"
-            autocomplete="current-password"
-        >
-
-        <div class="auth-buttons">
-            <button type="button" onclick="registerUser()">注册</button>
-            <button type="button" onclick="loginUser()">登录</button>
+    <section class="profile-page">
+        <div class="profile-card">
+            <img id="profileAvatar" class="profile-avatar" src="./avatar.jpg" alt="用户头像">
+            <h2 id="profileNickname">加载中...</h2>
+            <p id="profileEmail">加载中...</p>
+            <p id="profileCreatedAt">注册时间：加载中...</p>
+            <button id="profileLogoutButton" type="button" onclick="logoutUser()">退出登录</button>
+            <p id="profileMessage"></p>
         </div>
-
-        <button type="button" id="logoutButton" onclick="logoutUser()" hidden>退出登录</button>
-        <p id="authMessage"></p>
     </section>
 
     <script src="./script.js"></script>
