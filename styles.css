@@ -93,6 +93,23 @@ body {
     margin-top: 0;
 }
 
+.about-section {
+    width: 80%;
+    max-width: 800px;
+    margin: 24px auto 0;
+    padding: 28px 32px;
+    border-radius: 16px;
+    background-color: var(--surface-color);
+    box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+.about-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    font-size: 26px;
+}
+
 .contact {
     text-align: center;
 }
@@ -166,6 +183,70 @@ button:hover {
     color: var(--skill-text);
     background-color: var(--skill-bg);
     font-size: 15px;
+}
+
+.direction-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.direction-card {
+    padding: 20px;
+    border-radius: 16px;
+    background-color: var(--surface-alt);
+    box-shadow: 0 6px 18px var(--shadow-color);
+}
+
+.direction-card h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.direction-card p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.timeline {
+    display: grid;
+    gap: 16px;
+}
+
+.timeline-item {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 18px;
+    align-items: start;
+    padding: 18px;
+    border-radius: 16px;
+    background-color: var(--surface-alt);
+    box-shadow: 0 6px 18px var(--shadow-color);
+}
+
+.timeline-year {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background-color: var(--skill-bg);
+    color: var(--skill-text);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.timeline-content h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+}
+
+.timeline-content p {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.7;
 }
 
 .project-card {
@@ -740,6 +821,14 @@ body.dark-mode #logoutButton:hover {
     }
 
     .home-links {
+        grid-template-columns: 1fr;
+    }
+
+    .direction-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-item {
         grid-template-columns: 1fr;
     }
 
