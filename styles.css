@@ -681,6 +681,19 @@ body.dark-mode .comment-board {
     margin: 8px 0;
 }
 
+.profile-upload-box {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    margin: 18px 0 8px;
+    flex-wrap: wrap;
+}
+
+.avatar-upload-input {
+    max-width: 240px;
+}
+
 .profile-card button {
     margin-top: 18px;
 }

@@ -442,6 +442,124 @@ function formatUserDate(value) {
     }).format(date);
 }
 
+async function uploadSelectedAvatar() {
+    if (!supabaseClient) {
+        const profileMessage = document.getElementById("profileMessage");
+        if (profileMessage) {
+            profileMessage.textContent = "当前无法连接到用户服务。";
+        }
+        return;
+    }
+
+    const avatarInput = document.getElementById("avatarUploadInput");
+    const profileMessage = document.getElementById("profileMessage");
+
+    if (!avatarInput || !profileMessage) {
+        return;
+    }
+
+    const file = avatarInput.files[0];
+    if (!file) {
+        profileMessage.textContent = "请选择要上传的图片。";
+        return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    const isAllowedType = allowedTypes.includes(file.type);
+    const isAllowedExtension = ["jpg", "jpeg", "png", "webp"].includes(extension);
+
+    if (!isAllowedType || !isAllowedExtension) {
+        profileMessage.textContent = "仅支持 jpg / png / webp 格式图片。";
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        profileMessage.textContent = "图片大小不能超过 2MB。";
+        return;
+    }
+
+    try {
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+        if (userError || !userData?.user) {
+            profileMessage.textContent = "请先登录后再上传头像。";
+            return;
+        }
+
+        const user = userData.user;
+        const avatarPath = `${user.id}.${extension}`;
+        const uploadMessage = document.getElementById("profileMessage");
+
+        if (uploadMessage) {
+            uploadMessage.textContent = "正在上传头像...";
+        }
+
+        const { error: uploadError } = await supabaseClient.storage
+            .from("avatars")
+            .upload(avatarPath, file, {
+                cacheControl: "3600",
+                upsert: true,
+                contentType: file.type
+            });
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabaseClient.storage
+            .from("avatars")
+            .getPublicUrl(avatarPath);
+
+        const publicUrl = publicUrlData?.publicUrl;
+        if (!publicUrl) {
+            throw new Error("获取头像地址失败");
+        }
+
+        const { data: profileData, error: profileReadError } = await supabaseClient
+            .from("profiles")
+            .select("nickname, email")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileReadError) {
+            throw profileReadError;
+        }
+
+        const { error: profileUpdateError } = await supabaseClient
+            .from("profiles")
+            .upsert([
+                {
+                    id: user.id,
+                    email: profileData?.email || user.email,
+                    nickname: profileData?.nickname || user.email || "用户",
+                    avatar_url: publicUrl
+                }
+            ], {
+                onConflict: "id"
+            });
+
+        if (profileUpdateError) {
+            throw profileUpdateError;
+        }
+
+        const profileAvatar = document.getElementById("profileAvatar");
+        if (profileAvatar) {
+            profileAvatar.src = publicUrl;
+            profileAvatar.alt = profileData?.nickname || user.email || "用户";
+        }
+
+        if (profileMessage) {
+            profileMessage.textContent = "头像更新成功";
+        }
+    } catch (error) {
+        console.error("上传头像失败：", error);
+        if (profileMessage) {
+            profileMessage.textContent = "头像上传失败，请稍后重试。";
+        }
+    }
+}
+
 async function loadCurrentUserProfile() {
     const profileAvatar = document.getElementById("profileAvatar");
     const profileNickname = document.getElementById("profileNickname");

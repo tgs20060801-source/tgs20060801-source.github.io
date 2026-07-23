@@ -26,6 +26,17 @@
             <h2 id="profileNickname">加载中...</h2>
             <p id="profileEmail">加载中...</p>
             <p id="profileCreatedAt">注册时间：加载中...</p>
+
+            <div class="profile-upload-box">
+                <input
+                    id="avatarUploadInput"
+                    class="avatar-upload-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                >
+                <button id="avatarUploadButton" type="button" onclick="uploadSelectedAvatar()">上传头像</button>
+            </div>
+
             <button id="profileLogoutButton" type="button" onclick="logoutUser()">退出登录</button>
             <p id="profileMessage"></p>
         </div>
