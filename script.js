@@ -267,6 +267,127 @@ async function updateAuthStatus() {
     }
 }
 
+function formatCommentTime(value) {
+    if (!value) {
+        return "刚刚";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return "刚刚";
+    }
+
+    return new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(date);
+}
+
+function renderComments(comments) {
+    const commentsList = document.getElementById("commentsList");
+
+    if (!commentsList) {
+        return;
+    }
+
+    if (!comments || comments.length === 0) {
+        commentsList.innerHTML = "<p>目前还没有留言，快来留下一句吧。</p>";
+        return;
+    }
+
+    commentsList.innerHTML = comments.map((comment) => `
+        <article style="padding: 14px; border: 1px solid #d0d7de; border-radius: 10px; background: rgba(255,255,255,0.72);">
+            <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 8px;">
+                <strong>${comment.name || "匿名用户"}</strong>
+                <span style="color: #6b7280; font-size: 0.9em;">${formatCommentTime(comment.created_at)}</span>
+            </div>
+            <p style="margin: 0; white-space: pre-wrap;">${comment.message || ""}</p>
+        </article>
+    `).join("");
+}
+
+async function loadComments() {
+    const commentsList = document.getElementById("commentsList");
+
+    if (!commentsList) {
+        return;
+    }
+
+    if (!supabaseClient) {
+        commentsList.innerHTML = "<p>当前无法连接到留言服务。</p>";
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from("comments")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+
+        renderComments(data);
+    } catch (error) {
+        console.error("读取留言失败：", error);
+        commentsList.innerHTML = "<p>留言加载失败，请稍后重试。</p>";
+    }
+}
+
+async function submitComment(event) {
+    event.preventDefault();
+
+    const form = document.getElementById("commentForm");
+    const nameInput = document.getElementById("commentName");
+    const messageInput = document.getElementById("commentMessage");
+    const statusElement = document.getElementById("commentStatus");
+
+    if (!form || !nameInput || !messageInput || !statusElement) {
+        return;
+    }
+
+    if (!supabaseClient) {
+        statusElement.textContent = "当前无法连接到留言服务。";
+        return;
+    }
+
+    const name = nameInput.value.trim();
+    const message = messageInput.value.trim();
+
+    if (!name || !message) {
+        statusElement.textContent = "昵称和留言内容都不能为空。";
+        return;
+    }
+
+    statusElement.textContent = "正在提交留言……";
+
+    try {
+        const { error } = await supabaseClient
+            .from("comments")
+            .insert([
+                {
+                    name,
+                    message
+                }
+            ]);
+
+        if (error) {
+            throw error;
+        }
+
+        form.reset();
+        statusElement.textContent = "留言提交成功！";
+        await loadComments();
+    } catch (error) {
+        console.error("提交留言失败：", error);
+        statusElement.textContent = "留言提交失败，请稍后重试。";
+    }
+}
+
 const savedTheme = localStorage.getItem("theme");
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -282,4 +403,10 @@ if (supabaseClient && document.getElementById("authEmail")) {
     });
 
     updateAuthStatus();
+}
+
+const commentForm = document.getElementById("commentForm");
+if (commentForm) {
+    commentForm.addEventListener("submit", submitComment);
+    loadComments();
 }
