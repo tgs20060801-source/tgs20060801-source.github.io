@@ -314,23 +314,32 @@ async function detectAdminUser() {
             return false;
         }
 
+        const user = userData.user;
+        console.log("current user:", user);
+
         const { data: profileData, error: profileError } = await supabaseClient
             .from("profiles")
             .select("role")
-            .eq("id", userData.user.id)
+            .eq("id", user.id)
             .maybeSingle();
+
+        const profile = profileData;
+        console.log("profile:", profile);
 
         if (profileError) {
             console.error("读取管理员角色失败：", profileError);
             isAdmin = false;
+            console.log("isAdmin:", isAdmin);
             return false;
         }
 
-        isAdmin = profileData?.role === "admin";
+        isAdmin = profile?.role === "admin";
+        console.log("isAdmin:", isAdmin);
         return isAdmin;
     } catch (error) {
         console.error("管理员检测失败：", error);
         isAdmin = false;
+        console.log("isAdmin:", isAdmin);
         return false;
     }
 }
