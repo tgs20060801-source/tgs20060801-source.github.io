@@ -169,7 +169,9 @@ async function registerUser() {
     }
 
     const nicknameInput = document.getElementById("authNickname");
-    if (nicknameInput && !input.nickname) {
+    const registerNickname = nicknameInput ? nicknameInput.value.trim() : "";
+
+    if (nicknameInput && !registerNickname) {
         input.message.textContent = "请填写昵称。";
         return;
     }
@@ -197,7 +199,7 @@ async function registerUser() {
                     {
                         id: data.user.id,
                         email: input.email,
-                        nickname: input.nickname,
+                        nickname: registerNickname,
                         avatar_url: "",
                         role: "user"
                     }
