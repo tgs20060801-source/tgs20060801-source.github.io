@@ -30,6 +30,8 @@ const supabaseClient = typeof supabase !== "undefined"
     ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
     : null;
 
+const DEFAULT_AVATAR_URL = "./images/default-avatar.svg";
+
 let isAdmin = false;
 
 async function insertVisitorRecord() {
@@ -191,6 +193,7 @@ async function registerUser() {
                         id: data.user.id,
                         email: input.email,
                         nickname: input.nickname,
+                        avatar_url: "",
                         role: "user"
                     }
                 ], {
@@ -549,6 +552,8 @@ async function uploadSelectedAvatar() {
             profileAvatar.alt = profileData?.nickname || user.email || "用户";
         }
 
+        await loadCurrentUserProfile();
+
         if (profileMessage) {
             profileMessage.textContent = "头像更新成功";
         }
@@ -603,7 +608,7 @@ async function loadCurrentUserProfile() {
         const profile = profileData || {};
         const nickname = profile.nickname || user.email || "用户";
         const email = profile.email || user.email || "未知邮箱";
-        const avatarUrl = profile.avatar_url || "./avatar.jpg";
+        const avatarUrl = profile.avatar_url || DEFAULT_AVATAR_URL;
         const createdAt = user.created_at || profile.created_at || "";
 
         profileAvatar.src = avatarUrl;
