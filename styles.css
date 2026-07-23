@@ -721,6 +721,39 @@ body.dark-mode .comment-board {
     flex: 1;
 }
 
+.auth-user-panel {
+    margin-top: 16px;
+}
+
+.auth-user-card {
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--surface-color);
+    box-shadow: 0 8px 24px var(--shadow-color);
+}
+
+.auth-user-label {
+    margin: 12px 0 6px;
+    font-size: 14px;
+    color: var(--muted-color);
+}
+
+.auth-user-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.auth-status-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.auth-status-actions button {
+    flex: 1;
+}
+
 #logoutButton {
     width: 100%;
     background-color: #555;

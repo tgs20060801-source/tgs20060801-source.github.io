@@ -316,13 +316,12 @@ async function logoutUser() {
 
 async function updateAuthStatus() {
     const message = document.getElementById("authMessage");
-    const logoutButton = document.getElementById("logoutButton");
-    const emailInput = document.getElementById("authEmail");
-    const passwordInput = document.getElementById("authPassword");
-    const nicknameInput = document.getElementById("authNickname");
-    const authButtons = document.querySelector(".auth-buttons");
+    const authForm = document.getElementById("authForm");
+    const authUserPanel = document.getElementById("authUserPanel");
+    const authCurrentNickname = document.getElementById("authCurrentNickname");
+    const authCurrentEmail = document.getElementById("authCurrentEmail");
 
-    if (!message || !logoutButton || !emailInput || !passwordInput || !authButtons) {
+    if (!message || !authForm || !authUserPanel) {
         return;
     }
 
@@ -340,22 +339,37 @@ async function updateAuthStatus() {
     const session = data.session;
 
     if (session) {
-        logoutButton.hidden = false;
-        emailInput.disabled = true;
-        passwordInput.disabled = true;
-        if (nicknameInput) {
-            nicknameInput.disabled = true;
+        let nickname = session.user.email || "用户";
+        let email = session.user.email || "未知邮箱";
+
+        try {
+            const { data: profileData, error: profileError } = await supabaseClient
+                .from("profiles")
+                .select("nickname, email")
+                .eq("id", session.user.id)
+                .maybeSingle();
+
+            if (!profileError && profileData) {
+                nickname = profileData.nickname || nickname;
+                email = profileData.email || email;
+            }
+        } catch (profileError) {
+            console.error("读取用户资料失败：", profileError);
         }
-        authButtons.hidden = true;
-        message.textContent = "当前已登录：" + session.user.email;
+
+        authForm.hidden = true;
+        authUserPanel.hidden = false;
+        if (authCurrentNickname) {
+            authCurrentNickname.textContent = nickname;
+        }
+        if (authCurrentEmail) {
+            authCurrentEmail.textContent = email;
+        }
+        message.textContent = "当前已登录：" + email;
     } else {
-        logoutButton.hidden = true;
-        emailInput.disabled = false;
-        passwordInput.disabled = false;
-        if (nicknameInput) {
-            nicknameInput.disabled = false;
-        }
-        authButtons.hidden = false;
+        authForm.hidden = false;
+        authUserPanel.hidden = true;
+        message.textContent = "";
     }
 }
 
