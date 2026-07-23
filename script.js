@@ -298,10 +298,17 @@ function setCommentStatus(message, type = "") {
 
     if (type === "success") {
         statusElement.classList.add("success");
+        statusElement.classList.add("show");
     }
 
     if (type === "error") {
         statusElement.classList.add("error");
+        statusElement.style.display = "inline-flex";
+    }
+
+    if (!message) {
+        statusElement.style.display = "none";
+        statusElement.classList.remove("show");
     }
 }
 
@@ -336,11 +343,11 @@ function renderComments(comments) {
 
         const author = document.createElement("div");
         author.className = "comment-author";
-        author.textContent = comment.name || "匿名用户";
+        author.textContent = `👤 ${comment.name || "匿名用户"}`;
 
         const time = document.createElement("div");
         time.className = "comment-time";
-        time.textContent = formatCommentTime(comment.created_at);
+        time.textContent = `🕒 ${formatCommentTime(comment.created_at)}`;
 
         meta.appendChild(author);
         meta.appendChild(time);
@@ -390,56 +397,56 @@ async function submitComment(event) {
     const form = document.getElementById("commentForm");
     const nameInput = document.getElementById("commentName");
     const messageInput = document.getElementById("commentMessage");
-    const statusElement = document.getElementById("commentStatus");
     const submitButton = form?.querySelector("button[type='submit']");
 
-    if (!form || !nameInput || !messageInput || !statusElement) {
+    if (!form || !nameInput || !messageInput) {
         return;
     }
 
     if (!supabaseClient) {
-            setCommentStatus("❌ 当前无法连接到留言服务。", "error");
-            return;
+        setCommentStatus("❌ 当前无法连接到留言服务。", "error");
+        return;
+    }
+
+    const name = nameInput.value.trim();
+    const message = messageInput.value.trim();
+
+    if (!name || !message) {
+        setCommentStatus("❌ 昵称和留言内容都不能为空。", "error");
+        return;
+    }
+
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "提交中...";
+    }
+
+    setCommentStatus("", "");
+
+    try {
+        const { error } = await supabaseClient
+            .from("comments")
+            .insert([
+                {
+                    name,
+                    message
+                }
+            ]);
+
+        if (error) {
+            throw error;
         }
 
-        const name = nameInput.value.trim();
-        const message = messageInput.value.trim();
-
-        if (!name || !message) {
-            setCommentStatus("❌ 昵称和留言内容都不能为空。", "error");
-            return;
-        }
-
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent = "提交中...";
-        }
-
-        setCommentStatus("", "");
-
-        try {
-            const { error } = await supabaseClient
-                .from("comments")
-                .insert([
-                    {
-                        name,
-                        message
-                    }
-                ]);
-
-            if (error) {
-                throw error;
-            }
-
-            form.reset();
-            setCommentStatus("✅ 留言成功！", "success");
-            window.setTimeout(() => {
-                setCommentStatus("", "");
-            }, 2000);
-            await loadComments();
-        } catch (error) {
-            console.error("提交留言失败：", error);
-            setCommentStatus("❌ 留言失败，请稍后重试", "error");
+        form.reset();
+        setCommentStatus("✅ 留言成功！", "success");
+        window.setTimeout(() => {
+            setCommentStatus("", "");
+        }, 2000);
+        await loadComments();
+    } catch (error) {
+        console.error("提交留言失败：", error);
+        setCommentStatus("❌ 留言失败，请稍后重试", "error");
+    } finally {
         if (submitButton) {
             submitButton.disabled = false;
             submitButton.textContent = "提交留言";
