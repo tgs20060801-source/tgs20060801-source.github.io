@@ -1,6 +1,31 @@
 const SUPABASE_URL = "https://imokmchcmeuctrmamjrr.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Qn1qno4S-tYe94i-G00wGA_gtVxK3V9";
 
+// 敏感词列表：管理员可在此处自行增加或删除词条。
+const badWords = [
+    // 中文辱骂
+    "傻逼",
+    "煞笔",
+    "傻比",
+    "妈的",
+    "操你妈",
+    "草泥马",
+    "cnm",
+    "sb",
+    "垃圾",
+    "废物",
+
+    // 色情相关
+    "色情",
+    "约炮",
+    "裸聊",
+
+    // 广告诈骗相关
+    "加微信",
+    "加QQ",
+    "兼职赚钱"
+];
+
 const supabaseClient = typeof supabase !== "undefined"
     ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
     : null;
@@ -267,6 +292,12 @@ async function updateAuthStatus() {
     }
 }
 
+function containsBadWord(text) {
+    const normalizedText = String(text || "").toLowerCase();
+
+    return badWords.some((word) => normalizedText.includes(word.toLowerCase()));
+}
+
 function formatCommentTime(value) {
     if (!value) {
         return "刚刚";
@@ -413,6 +444,12 @@ async function submitComment(event) {
 
     if (!name || !message) {
         setCommentStatus("❌ 昵称和留言内容都不能为空。", "error");
+        return;
+    }
+
+    const combinedText = `${name} ${message}`;
+    if (containsBadWord(combinedText)) {
+        setCommentStatus("留言包含不适内容，请修改后提交", "error");
         return;
     }
 
