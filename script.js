@@ -125,6 +125,10 @@ function getAuthInput() {
     const passwordInput = document.getElementById("authPassword");
     const message = document.getElementById("authMessage");
 
+    if (!message || !emailInput || !passwordInput) {
+        return null;
+    }
+
     const nickname = nicknameInput ? nicknameInput.value.trim() : "";
     const email = emailInput.value.trim();
     const password = passwordInput.value;
@@ -164,7 +168,8 @@ async function registerUser() {
         return;
     }
 
-    if (document.getElementById("authNickname") && !input.nickname) {
+    const nicknameInput = document.getElementById("authNickname");
+    if (nicknameInput && !input.nickname) {
         input.message.textContent = "请填写昵称。";
         return;
     }
@@ -342,7 +347,7 @@ async function updateAuthStatus() {
     const session = data.session;
 
     if (session) {
-        let nickname = session.user.email || "用户";
+        let nickname = "用户";
         let email = session.user.email || "未知邮箱";
 
         try {
