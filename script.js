@@ -30,6 +30,8 @@ const supabaseClient = typeof supabase !== "undefined"
     ? supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
     : null;
 
+let isAdmin = false;
+
 async function insertVisitorRecord() {
     if (!supabaseClient) {
         return;
@@ -298,6 +300,41 @@ function containsBadWord(text) {
     return badWords.some((word) => normalizedText.includes(word.toLowerCase()));
 }
 
+async function detectAdminUser() {
+    if (!supabaseClient) {
+        isAdmin = false;
+        return false;
+    }
+
+    try {
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+        if (userError || !userData?.user) {
+            isAdmin = false;
+            return false;
+        }
+
+        const { data: profileData, error: profileError } = await supabaseClient
+            .from("profiles")
+            .select("role")
+            .eq("id", userData.user.id)
+            .maybeSingle();
+
+        if (profileError) {
+            console.error("读取管理员角色失败：", profileError);
+            isAdmin = false;
+            return false;
+        }
+
+        isAdmin = profileData?.role === "admin";
+        return isAdmin;
+    } catch (error) {
+        console.error("管理员检测失败：", error);
+        isAdmin = false;
+        return false;
+    }
+}
+
 function formatCommentTime(value) {
     if (!value) {
         return "刚刚";
@@ -329,6 +366,7 @@ function setCommentStatus(message, type = "") {
 
     if (type === "success") {
         statusElement.classList.add("success");
+        statusElement.style.display = "inline-flex";
         statusElement.classList.add("show");
     }
 
@@ -383,6 +421,15 @@ function renderComments(comments) {
         meta.appendChild(author);
         meta.appendChild(time);
 
+        if (isAdmin) {
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "comment-delete-button";
+            deleteButton.type = "button";
+            deleteButton.textContent = "🗑 删除";
+            deleteButton.addEventListener("click", () => deleteComment(comment.id));
+            meta.appendChild(deleteButton);
+        }
+
         const content = document.createElement("p");
         content.className = "comment-content";
         content.textContent = comment.message || "";
@@ -405,6 +452,8 @@ async function loadComments() {
         return;
     }
 
+    await detectAdminUser();
+
     try {
         const { data, error } = await supabaseClient
             .from("comments")
@@ -419,6 +468,32 @@ async function loadComments() {
     } catch (error) {
         console.error("读取留言失败：", error);
         commentsList.innerHTML = "<p>留言加载失败，请稍后重试。</p>";
+    }
+}
+
+async function deleteComment(commentId) {
+    if (!supabaseClient || !isAdmin) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from("comments")
+            .delete()
+            .eq("id", commentId);
+
+        if (error) {
+            throw error;
+        }
+
+        setCommentStatus("删除成功", "success");
+        window.setTimeout(() => {
+            setCommentStatus("", "");
+        }, 2000);
+        await loadComments();
+    } catch (error) {
+        console.error("删除留言失败：", error);
+        setCommentStatus("删除失败，请稍后重试", "error");
     }
 }
 
