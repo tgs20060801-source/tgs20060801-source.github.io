@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧警务网络安全态势感知与异常行为检测系统 - 谭sir的个人网站</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="d7a13b04-1505-419a-add0-85c84ff18758"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="./index.html">首页</a>
+        <a href="./about.html">关于我</a>
+        <a href="./projects.html">我的项目</a>
+        <a href="./contact.html">联系我</a>
+        <a href="./login.html">注册 / 登录</a>
+        <button class="theme-toggle" type="button" onclick="toggleTheme()" id="themeToggle" aria-label="切换深色模式">
+            🌙 深色模式
+        </button>
+    </nav>
+
+    <article class="project-detail">
+        <section class="project-hero">
+            <h2>智慧警务网络安全态势感知与异常行为检测系统</h2>
+            <p>本项目围绕智慧警务场景中的网络安全日志分析需求，构建了一套从数据生成、数据清洗、特征工程、异常行为检测、风险评分到可视化展示的完整分析流程。项目当前使用模拟网络安全日志进行实验验证，不声称已部署于真实公安业务系统。</p>
+            <div class="project-tags">
+                <span>Python</span>
+                <span>Pandas</span>
+                <span>Scikit-learn</span>
+                <span>异常检测</span>
+                <span>Streamlit</span>
+                <span>Plotly</span>
+                <span>网络安全</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-label">日志规模</span>
+                    <span class="metric-value">100,000</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">最佳模型</span>
+                    <span class="metric-value">One-Class SVM</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">F1 Score</span>
+                    <span class="metric-value">0.6893</span>
+                </div>
+            </div>
+            <a class="button-link" href="https://github.com/tgs20060801-source/Smart-Police-Security" target="_blank" rel="noopener noreferrer">GitHub 代码链接</a>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目概述</h3>
+            <p>项目面向智慧警务网络安全态势感知场景，完成日志分析、异常识别和风险辅助研判，形成从数据到决策支持的闭环流程。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>数据说明</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>内容</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>数据性质</td>
+                        <td>模拟网络安全日志</td>
+                    </tr>
+                    <tr>
+                        <td>日志规模</td>
+                        <td>100,000 条</td>
+                    </tr>
+                    <tr>
+                        <td>特征维度</td>
+                        <td>42 个</td>
+                    </tr>
+                    <tr>
+                        <td>分析方式</td>
+                        <td>离线批处理</td>
+                    </tr>
+                    <tr>
+                        <td>输出结果</td>
+                        <td>异常事件、风险 IP、风险等级</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="detail-section">
+            <h3>数据处理流程</h3>
+            <ul class="detail-list">
+                <li>模拟日志生成</li>
+                <li>缺失值与异常值处理</li>
+                <li>字段标准化</li>
+                <li>网络安全特征构建</li>
+                <li>模型训练与比较</li>
+                <li>事件和 IP 风险评分</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>网络安全特征工程</h3>
+            <p>围绕攻击行为识别构建了访问频率、失败率、近期访问行为、流量变化、突发访问、端口扫描压力和信誉风险等特征，为异常检测与风险评分提供统一输入。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>异常检测模型比较</h3>
+            <ul class="detail-list">
+                <li>Isolation Forest</li>
+                <li>Local Outlier Factor</li>
+                <li>One-Class SVM</li>
+            </ul>
+            <p>项目根据当前模拟数据实验指标对模型进行了比较，并按照 F1 Score 选择 One-Class SVM 作为当前最佳模型。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>模型实验结果</h3>
+            <p>以下指标来自当前模拟数据实验结果，不代表真实生产环境效果。</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>指标</th>
+                        <th>数值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Precision</td>
+                        <td>0.5259</td>
+                    </tr>
+                    <tr>
+                        <td>Recall</td>
+                        <td>1.0000</td>
+                    </tr>
+                    <tr>
+                        <td>F1 Score</td>
+                        <td>0.6893</td>
+                    </tr>
+                    <tr>
+                        <td>ROC-AUC</td>
+                        <td>0.999995</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="detail-section">
+            <h3>风险研判机制</h3>
+            <p>系统综合模型异常结果、访问频率、失败率、端口扫描压力、突发行为和 IP 信誉因素，输出 risk_score，并映射为 Low、Medium、High、Critical 四级风险标签。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>Dashboard 功能</h3>
+            <ul class="detail-list">
+                <li>总体安全指标</li>
+                <li>风险趋势图</li>
+                <li>高风险 IP 排行</li>
+                <li>模型效果对比</li>
+                <li>异常事件查询</li>
+                <li>风险等级筛选</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目结论</h3>
+            <p>项目完成了从数据到风险展示的完整工程链路，并验证了多模型异常检测与风险评分组合方法在当前模拟日志实验中的可行性。</p>
+        </section>
+
+        <section class="detail-section">
+            <h3>项目局限性</h3>
+            <ul class="detail-list">
+                <li>当前使用模拟数据。</li>
+                <li>与真实警务网络环境存在差异。</li>
+                <li>当前以离线批处理为主。</li>
+                <li>尚未接入实时流式日志。</li>
+                <li>模型解释能力仍可继续优化。</li>
+            </ul>
+        </section>
+
+        <section class="detail-section">
+            <h3>图片展示区域</h3>
+            <div class="image-grid">
+                <div class="image-card">
+                    <h4>系统总体态势页面</h4>
+                    <img src="./images/smart-police/dashboard_home.png" alt="智慧警务网络安全系统总体态势页面，展示核心安全指标与风险分布" class="project-image">
+                </div>
+                <div class="image-card">
+                    <h4>异常检测模型对比</h4>
+                    <img src="./images/smart-police/model_comparison.png" alt="智慧警务异常检测模型对比图，展示 Isolation Forest、LOF 与 One-Class SVM 的指标表现" class="project-image">
+                </div>
+                <div class="image-card">
+                    <h4>风险分析与异常事件查询</h4>
+                    <img src="./images/smart-police/risk_analysis.png" alt="风险分析与异常事件查询页面，展示高风险 IP 与异常事件筛选结果" class="project-image">
+                </div>
+            </div>
+        </section>
+    </article>
+
+    <script src="./script.js"></script>
+</body>
+</html>
