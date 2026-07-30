@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的相册 - 谭sir的个人网站</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="d7a13b04-1505-419a-add0-85c84ff18758"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="album-page">
+    <nav class="navbar">
+        <a href="./index.html">首页</a>
+        <a href="./about.html">关于我</a>
+        <a href="./projects.html">我的项目</a>
+        <a href="./album.html">我的相册</a>
+        <a href="./contact.html">联系我</a>
+        <a href="./login.html">注册 / 登录</a>
+        <button class="theme-toggle" type="button" onclick="toggleTheme()" id="themeToggle" aria-label="切换深色模式">
+            🌙 深色模式
+        </button>
+    </nav>
+
+    <main class="album-page-container">
+        <section class="album-header">
+            <h2>我的相册</h2>
+            <p>记录生活、学习与项目路上的每个片段。</p>
+        </section>
+
+        <p id="albumLoading" class="album-status">正在加载相册...</p>
+        <p id="albumEmpty" class="album-empty" hidden>当前相册为空，暂无可展示照片。</p>
+
+        <section id="albumGrid" class="album-grid" aria-live="polite"></section>
+
+        <section id="albumAdmin" class="album-admin" hidden>
+            <h3>管理员上传照片</h3>
+            <form id="albumUploadForm" class="album-form">
+                <label for="albumFile">照片文件</label>
+                <input id="albumFile" name="albumFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+
+                <label for="albumTitle">标题（必填）</label>
+                <input id="albumTitle" name="albumTitle" type="text" maxlength="100" required>
+
+                <label for="albumDescription">照片说明</label>
+                <textarea id="albumDescription" name="albumDescription" rows="4" maxlength="600"></textarea>
+
+                <label for="albumLocation">拍摄地点</label>
+                <input id="albumLocation" name="albumLocation" type="text" maxlength="120">
+
+                <label for="albumShotAt">拍摄日期</label>
+                <input id="albumShotAt" name="albumShotAt" type="date">
+
+                <label for="albumSortOrder">展示顺序</label>
+                <input id="albumSortOrder" name="albumSortOrder" type="number" value="0">
+
+                <label class="album-checkbox" for="albumVisible">
+                    <input id="albumVisible" name="albumVisible" type="checkbox" checked>
+                    是否公开展示
+                </label>
+
+                <button id="albumUploadButton" type="submit">上传照片</button>
+                <p id="albumAdminStatus" class="album-status" aria-live="polite"></p>
+            </form>
+        </section>
+    </main>
+
+    <div id="albumLightbox" class="album-lightbox" hidden>
+        <div class="album-lightbox-panel">
+            <button id="albumLightboxClose" class="album-lightbox-close" type="button" aria-label="关闭预览">×</button>
+            <img id="albumLightboxImage" class="album-lightbox-image" src="" alt="相册预览">
+            <p id="albumLightboxCaption" class="album-lightbox-caption"></p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script src="./album.js"></script>
+</body>
+</html>
