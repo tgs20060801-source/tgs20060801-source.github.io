@@ -27,48 +27,194 @@
             <p>记录生活、学习与项目路上的每个片段。</p>
         </section>
 
-        <p id="albumLoading" class="album-status">正在加载相册...</p>
-        <p id="albumEmpty" class="album-empty" hidden>当前相册为空，暂无可展示照片。</p>
+        <p id="albumPageStatus" class="album-status" aria-live="polite">正在加载相册...</p>
 
-        <section id="albumGrid" class="album-grid" aria-live="polite"></section>
+        <section id="albumHomeView" class="album-home-view" hidden>
+            <section id="albumCollectionsGrid" class="album-collections-grid" aria-live="polite"></section>
+            <p id="albumCollectionsEmpty" class="album-empty" hidden>当前暂无可展示的相册集。</p>
+        </section>
+
+        <section id="albumDetailView" class="album-detail-view" hidden>
+            <nav class="album-breadcrumb" aria-label="面包屑">
+                <button id="albumBackButton" class="album-back-button" type="button">返回全部相册</button>
+                <span>我的相册</span>
+                <span>&gt;</span>
+                <span id="albumCurrentCollectionName">相册详情</span>
+            </nav>
+
+            <section class="album-detail-header">
+                <h3 id="albumDetailTitle">相册详情</h3>
+                <p id="albumDetailDescription"></p>
+            </section>
+
+            <section id="albumPhotoGrid" class="album-grid" aria-live="polite"></section>
+            <p id="albumPhotoEmpty" class="album-empty" hidden>当前相册为空，暂无可展示照片。</p>
+        </section>
+
+        <section id="albumNotFound" class="album-empty" hidden>相册不存在或暂不可见。</section>
 
         <section id="albumAdmin" class="album-admin" hidden>
-            <h3>管理员上传照片</h3>
-            <form id="albumUploadForm" class="album-form">
-                <label for="albumFile">照片文件</label>
-                <input id="albumFile" name="albumFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+            <h3>管理员管理区</h3>
+            <div class="album-admin-grid">
+                <article class="album-admin-card">
+                    <h4>创建相册集</h4>
+                    <form id="albumCollectionForm" class="album-form">
+                        <div class="album-form-grid">
+                            <div class="album-field">
+                                <label for="collectionName">相册集名称（必填）</label>
+                                <input id="collectionName" name="collectionName" type="text" maxlength="80" required>
+                            </div>
+                            <div class="album-field">
+                                <label for="collectionSortOrder">展示顺序</label>
+                                <input id="collectionSortOrder" name="collectionSortOrder" type="number" value="0">
+                            </div>
+                            <div class="album-field album-field-full">
+                                <label for="collectionDescription">相册集说明</label>
+                                <textarea id="collectionDescription" name="collectionDescription" rows="4" maxlength="500"></textarea>
+                            </div>
+                        </div>
+                        <label class="album-checkbox" for="collectionVisible">
+                            <input id="collectionVisible" name="collectionVisible" type="checkbox" checked>
+                            是否公开
+                        </label>
+                        <button id="collectionCreateButton" type="submit">创建相册集</button>
+                        <p id="albumCollectionStatus" class="album-status" aria-live="polite"></p>
+                    </form>
+                </article>
 
-                <label for="albumTitle">标题（必填）</label>
-                <input id="albumTitle" name="albumTitle" type="text" maxlength="100" required>
+                <article class="album-admin-card">
+                    <h4>上传照片</h4>
+                    <form id="albumUploadForm" class="album-form">
+                        <div class="album-form-grid">
+                            <div class="album-field">
+                                <label for="albumFile">照片文件</label>
+                                <input id="albumFile" name="albumFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+                            </div>
+                            <div class="album-field">
+                                <label for="albumCollectionSelect">所属相册集</label>
+                                <select id="albumCollectionSelect" name="albumCollectionSelect" required></select>
+                            </div>
+                            <div class="album-field">
+                                <label for="albumTitle">标题（必填）</label>
+                                <input id="albumTitle" name="albumTitle" type="text" maxlength="100" required>
+                            </div>
+                            <div class="album-field">
+                                <label for="albumSortOrder">展示顺序</label>
+                                <input id="albumSortOrder" name="albumSortOrder" type="number" value="0">
+                            </div>
+                            <div class="album-field album-field-full">
+                                <label for="albumDescription">照片说明</label>
+                                <textarea id="albumDescription" name="albumDescription" rows="4" maxlength="600"></textarea>
+                            </div>
+                            <div class="album-field">
+                                <label for="albumLocation">拍摄地点</label>
+                                <input id="albumLocation" name="albumLocation" type="text" maxlength="120">
+                            </div>
+                            <div class="album-field">
+                                <label for="albumShotAt">拍摄日期</label>
+                                <input id="albumShotAt" name="albumShotAt" type="date">
+                            </div>
+                        </div>
 
-                <label for="albumDescription">照片说明</label>
-                <textarea id="albumDescription" name="albumDescription" rows="4" maxlength="600"></textarea>
+                        <label class="album-checkbox" for="albumVisible">
+                            <input id="albumVisible" name="albumVisible" type="checkbox" checked>
+                            是否公开展示
+                        </label>
 
-                <label for="albumLocation">拍摄地点</label>
-                <input id="albumLocation" name="albumLocation" type="text" maxlength="120">
-
-                <label for="albumShotAt">拍摄日期</label>
-                <input id="albumShotAt" name="albumShotAt" type="date">
-
-                <label for="albumSortOrder">展示顺序</label>
-                <input id="albumSortOrder" name="albumSortOrder" type="number" value="0">
-
-                <label class="album-checkbox" for="albumVisible">
-                    <input id="albumVisible" name="albumVisible" type="checkbox" checked>
-                    是否公开展示
-                </label>
-
-                <button id="albumUploadButton" type="submit">上传照片</button>
-                <p id="albumAdminStatus" class="album-status" aria-live="polite"></p>
-            </form>
+                        <button id="albumUploadButton" type="submit">上传照片</button>
+                        <p id="albumAdminStatus" class="album-status" aria-live="polite"></p>
+                    </form>
+                </article>
+            </div>
         </section>
     </main>
+
+    <div id="albumCollectionModal" class="album-modal" hidden>
+        <div class="album-modal-panel">
+            <h4>编辑相册集</h4>
+            <form id="albumCollectionEditForm" class="album-form">
+                <input id="editCollectionId" type="hidden">
+                <div class="album-form-grid">
+                    <div class="album-field">
+                        <label for="editCollectionName">相册集名称（必填）</label>
+                        <input id="editCollectionName" type="text" maxlength="80" required>
+                    </div>
+                    <div class="album-field">
+                        <label for="editCollectionSortOrder">展示顺序</label>
+                        <input id="editCollectionSortOrder" type="number" required>
+                    </div>
+                    <div class="album-field album-field-full">
+                        <label for="editCollectionDescription">相册集说明</label>
+                        <textarea id="editCollectionDescription" rows="4" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <label class="album-checkbox" for="editCollectionVisible">
+                    <input id="editCollectionVisible" type="checkbox">
+                    是否公开
+                </label>
+                <div class="album-modal-actions">
+                    <button id="collectionSaveButton" type="submit">保存</button>
+                    <button id="collectionCancelButton" type="button">取消</button>
+                </div>
+                <p id="albumCollectionEditStatus" class="album-status" aria-live="polite"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="albumPhotoModal" class="album-modal" hidden>
+        <div class="album-modal-panel">
+            <h4>编辑照片</h4>
+            <form id="albumPhotoEditForm" class="album-form">
+                <input id="editPhotoId" type="hidden">
+                <div class="album-form-grid">
+                    <div class="album-field">
+                        <label for="editPhotoTitle">标题（必填）</label>
+                        <input id="editPhotoTitle" type="text" maxlength="100" required>
+                    </div>
+                    <div class="album-field">
+                        <label for="editPhotoCollection">所属相册集</label>
+                        <select id="editPhotoCollection" required></select>
+                    </div>
+                    <div class="album-field album-field-full">
+                        <label for="editPhotoDescription">照片说明</label>
+                        <textarea id="editPhotoDescription" rows="4" maxlength="600"></textarea>
+                    </div>
+                    <div class="album-field">
+                        <label for="editPhotoLocation">拍摄地点</label>
+                        <input id="editPhotoLocation" type="text" maxlength="120">
+                    </div>
+                    <div class="album-field">
+                        <label for="editPhotoShotAt">拍摄日期</label>
+                        <input id="editPhotoShotAt" type="date">
+                    </div>
+                    <div class="album-field">
+                        <label for="editPhotoSortOrder">展示顺序</label>
+                        <input id="editPhotoSortOrder" type="number" required>
+                    </div>
+                </div>
+                <label class="album-checkbox" for="editPhotoVisible">
+                    <input id="editPhotoVisible" type="checkbox">
+                    是否公开展示
+                </label>
+                <div class="album-modal-actions">
+                    <button id="photoSaveButton" type="submit">保存</button>
+                    <button id="photoCancelButton" type="button">取消</button>
+                </div>
+                <p id="albumPhotoEditStatus" class="album-status" aria-live="polite"></p>
+            </form>
+        </div>
+    </div>
 
     <div id="albumLightbox" class="album-lightbox" hidden>
         <div class="album-lightbox-panel">
             <button id="albumLightboxClose" class="album-lightbox-close" type="button" aria-label="关闭预览">×</button>
+            <button id="albumLightboxPrev" class="album-lightbox-prev" type="button" aria-label="上一张">‹</button>
+            <button id="albumLightboxNext" class="album-lightbox-next" type="button" aria-label="下一张">›</button>
             <img id="albumLightboxImage" class="album-lightbox-image" src="" alt="相册预览">
-            <p id="albumLightboxCaption" class="album-lightbox-caption"></p>
+            <div class="album-lightbox-meta">
+                <p id="albumLightboxTitle" class="album-lightbox-title"></p>
+                <p id="albumLightboxCounter" class="album-lightbox-counter"></p>
+            </div>
         </div>
     </div>
 
