@@ -1220,8 +1220,23 @@ body.dark-mode #logoutButton:hover {
 .album-actions button {
     margin-top: 0;
     flex: 1;
+    min-width: 0;
+    height: 38px;
     padding: 8px 10px;
     font-size: 14px;
+}
+
+.album-actions .album-delete-button:disabled {
+    background-color: var(--surface-alt);
+    border: 1px solid var(--border-color);
+    color: var(--muted-color);
+    cursor: not-allowed;
+    opacity: 0.8;
+    box-shadow: none;
+}
+
+.album-actions .album-delete-button:disabled:hover {
+    background-color: var(--surface-alt);
 }
 
 .album-delete-button {
@@ -1383,7 +1398,7 @@ body.dark-mode #logoutButton:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 14px 14px 12px;
+    padding: 12px 14px 14px;
     text-align: left;
     background: linear-gradient(180deg, rgba(8, 12, 20, 0) 0%, rgba(8, 12, 20, 0.82) 70%);
 }
@@ -1394,18 +1409,11 @@ body.dark-mode #logoutButton:hover {
     font-size: 20px;
 }
 
-.album-collection-overlay p {
-    margin: 6px 0 0;
-    color: rgba(248, 250, 252, 0.92);
-    font-size: 13px;
-    line-height: 1.5;
-}
-
 .album-collection-badges {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 .album-collection-count,
@@ -1476,8 +1484,9 @@ body.dark-mode #logoutButton:hover {
 
 .album-admin-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 18px;
+    max-width: 760px;
 }
 
 .album-admin-card {
@@ -1498,6 +1507,21 @@ body.dark-mode #logoutButton:hover {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+}
+
+.album-form-grid-simple {
+    grid-template-columns: 1fr;
+}
+
+#albumFile {
+    padding: 12px;
+    border: 1px dashed var(--border-color);
+    background-color: var(--surface-color);
+}
+
+#albumUploadButton {
+    width: fit-content;
+    min-width: 150px;
 }
 
 .album-field {
@@ -1611,10 +1635,6 @@ body.dark-mode #logoutButton:hover {
     .album-collections-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .album-admin-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (max-width: 700px) {
@@ -1628,6 +1648,10 @@ body.dark-mode #logoutButton:hover {
 
     .album-modal-panel {
         padding: 16px;
+    }
+
+    .album-actions {
+        gap: 8px;
     }
 
     .album-lightbox-prev,

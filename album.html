@@ -59,14 +59,10 @@
                 <article class="album-admin-card">
                     <h4>创建相册集</h4>
                     <form id="albumCollectionForm" class="album-form">
-                        <div class="album-form-grid">
+                        <div class="album-form-grid album-form-grid-simple">
                             <div class="album-field">
                                 <label for="collectionName">相册集名称（必填）</label>
                                 <input id="collectionName" name="collectionName" type="text" maxlength="80" required>
-                            </div>
-                            <div class="album-field">
-                                <label for="collectionSortOrder">展示顺序</label>
-                                <input id="collectionSortOrder" name="collectionSortOrder" type="number" value="0">
                             </div>
                             <div class="album-field album-field-full">
                                 <label for="collectionDescription">相册集说明</label>
@@ -85,41 +81,17 @@
                 <article class="album-admin-card">
                     <h4>上传照片</h4>
                     <form id="albumUploadForm" class="album-form">
-                        <div class="album-form-grid">
+                        <div class="album-form-grid album-form-grid-simple">
                             <div class="album-field">
                                 <label for="albumFile">照片文件</label>
-                                <input id="albumFile" name="albumFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+                                <input id="albumFile" name="albumFile" type="file" accept="image/jpeg,image/png,image/webp" multiple required>
                             </div>
-                            <div class="album-field">
+                            <div class="album-field" id="albumCollectionField">
                                 <label for="albumCollectionSelect">所属相册集</label>
                                 <select id="albumCollectionSelect" name="albumCollectionSelect" required></select>
                             </div>
-                            <div class="album-field">
-                                <label for="albumTitle">标题（必填）</label>
-                                <input id="albumTitle" name="albumTitle" type="text" maxlength="100" required>
-                            </div>
-                            <div class="album-field">
-                                <label for="albumSortOrder">展示顺序</label>
-                                <input id="albumSortOrder" name="albumSortOrder" type="number" value="0">
-                            </div>
-                            <div class="album-field album-field-full">
-                                <label for="albumDescription">照片说明</label>
-                                <textarea id="albumDescription" name="albumDescription" rows="4" maxlength="600"></textarea>
-                            </div>
-                            <div class="album-field">
-                                <label for="albumLocation">拍摄地点</label>
-                                <input id="albumLocation" name="albumLocation" type="text" maxlength="120">
-                            </div>
-                            <div class="album-field">
-                                <label for="albumShotAt">拍摄日期</label>
-                                <input id="albumShotAt" name="albumShotAt" type="date">
-                            </div>
                         </div>
-
-                        <label class="album-checkbox" for="albumVisible">
-                            <input id="albumVisible" name="albumVisible" type="checkbox" checked>
-                            是否公开展示
-                        </label>
+                        <input id="albumCollectionIdHidden" name="albumCollectionIdHidden" type="hidden" value="">
 
                         <button id="albumUploadButton" type="submit">上传照片</button>
                         <p id="albumAdminStatus" class="album-status" aria-live="polite"></p>
@@ -138,10 +110,6 @@
                     <div class="album-field">
                         <label for="editCollectionName">相册集名称（必填）</label>
                         <input id="editCollectionName" type="text" maxlength="80" required>
-                    </div>
-                    <div class="album-field">
-                        <label for="editCollectionSortOrder">展示顺序</label>
-                        <input id="editCollectionSortOrder" type="number" required>
                     </div>
                     <div class="album-field album-field-full">
                         <label for="editCollectionDescription">相册集说明</label>

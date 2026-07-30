@@ -25,20 +25,15 @@
     const albumCollectionForm = document.getElementById("albumCollectionForm");
     const collectionName = document.getElementById("collectionName");
     const collectionDescription = document.getElementById("collectionDescription");
-    const collectionSortOrder = document.getElementById("collectionSortOrder");
     const collectionVisible = document.getElementById("collectionVisible");
     const collectionCreateButton = document.getElementById("collectionCreateButton");
     const albumCollectionStatus = document.getElementById("albumCollectionStatus");
 
     const albumUploadForm = document.getElementById("albumUploadForm");
     const albumFile = document.getElementById("albumFile");
+    const albumCollectionField = document.getElementById("albumCollectionField");
     const albumCollectionSelect = document.getElementById("albumCollectionSelect");
-    const albumTitle = document.getElementById("albumTitle");
-    const albumDescription = document.getElementById("albumDescription");
-    const albumLocation = document.getElementById("albumLocation");
-    const albumShotAt = document.getElementById("albumShotAt");
-    const albumSortOrder = document.getElementById("albumSortOrder");
-    const albumVisible = document.getElementById("albumVisible");
+    const albumCollectionIdHidden = document.getElementById("albumCollectionIdHidden");
     const albumUploadButton = document.getElementById("albumUploadButton");
     const albumAdminStatus = document.getElementById("albumAdminStatus");
 
@@ -47,7 +42,6 @@
     const editCollectionId = document.getElementById("editCollectionId");
     const editCollectionName = document.getElementById("editCollectionName");
     const editCollectionDescription = document.getElementById("editCollectionDescription");
-    const editCollectionSortOrder = document.getElementById("editCollectionSortOrder");
     const editCollectionVisible = document.getElementById("editCollectionVisible");
     const collectionCancelButton = document.getElementById("collectionCancelButton");
     const albumCollectionEditStatus = document.getElementById("albumCollectionEditStatus");
@@ -151,6 +145,95 @@
         }
 
         return `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+    }
+
+    function getCollectionById(collectionId) {
+        return state.collections.find((item) => item.id === collectionId) || null;
+    }
+
+    function getSelectedUploadCollectionId() {
+        if (state.currentCollectionId && isUuid(state.currentCollectionId)) {
+            return state.currentCollectionId;
+        }
+
+        if (albumCollectionSelect) {
+            return albumCollectionSelect.value;
+        }
+
+        if (albumCollectionIdHidden) {
+            return albumCollectionIdHidden.value;
+        }
+
+        return "";
+    }
+
+    function extractTitleFromFilename(fileName) {
+        const pureName = String(fileName || "").replace(/\.[^.]*$/, "").trim();
+        return pureName || "照片";
+    }
+
+    function isLikelyAutoTitle(title) {
+        const value = String(title || "").trim();
+        if (!value) {
+            return true;
+        }
+
+        return /^(img|dsc|image|screenshot|wechat|wximg|微信图片)[_-]?\d+/i.test(value)
+            || /^\d{8,}$/.test(value)
+            || /^[a-z]{2,6}_?\d{6,}$/i.test(value);
+    }
+
+    function resolveDisplayTitle(title) {
+        const value = String(title || "").trim();
+        if (!value || isLikelyAutoTitle(value)) {
+            return "";
+        }
+        return value;
+    }
+
+    async function getNextPhotoSortOrder(collectionId) {
+        const { data, error } = await supabaseClient
+            .from("album_photos")
+            .select("sort_order")
+            .eq("collection_id", collectionId)
+            .order("sort_order", { ascending: false })
+            .limit(1);
+
+        if (error) {
+            throw error;
+        }
+
+        const currentMax = Array.isArray(data) && data.length > 0
+            ? Number.parseInt(data[0].sort_order, 10)
+            : -1;
+
+        if (Number.isNaN(currentMax)) {
+            return 0;
+        }
+
+        return currentMax + 1;
+    }
+
+    async function getNextCollectionSortOrder() {
+        const { data, error } = await supabaseClient
+            .from("album_collections")
+            .select("sort_order")
+            .order("sort_order", { ascending: false })
+            .limit(1);
+
+        if (error) {
+            throw error;
+        }
+
+        const currentMax = Array.isArray(data) && data.length > 0
+            ? Number.parseInt(data[0].sort_order, 10)
+            : -1;
+
+        if (Number.isNaN(currentMax)) {
+            return 0;
+        }
+
+        return currentMax + 1;
     }
 
     function syncBodyLock() {
@@ -259,9 +342,6 @@
         const name = document.createElement("h3");
         name.textContent = collection.name || "未命名相册";
 
-        const description = document.createElement("p");
-        description.textContent = collection.description || "暂无说明";
-
         const badges = document.createElement("div");
         badges.className = "album-collection-badges";
         badges.appendChild(createBadge(`${info.count} 张照片`, "album-collection-count"));
@@ -271,7 +351,6 @@
         }
 
         overlay.appendChild(name);
-        overlay.appendChild(description);
         overlay.appendChild(badges);
         coverButton.appendChild(overlay);
 
@@ -292,18 +371,24 @@
                 openCollectionEditor(collection);
             });
 
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "album-delete-button";
+
             actions.appendChild(editButton);
 
-            if (collection.id !== DEFAULT_COLLECTION_ID) {
-                const deleteButton = document.createElement("button");
-                deleteButton.type = "button";
-                deleteButton.className = "album-delete-button";
+            if (collection.id === DEFAULT_COLLECTION_ID) {
+                deleteButton.textContent = "默认相册";
+                deleteButton.disabled = true;
+                deleteButton.title = "默认相册受保护，不能删除";
+            } else {
                 deleteButton.textContent = "删除相册";
                 deleteButton.addEventListener("click", () => {
                     deleteCollection(collection);
                 });
-                actions.appendChild(deleteButton);
             }
+
+            actions.appendChild(deleteButton);
 
             card.appendChild(actions);
         }
@@ -454,44 +539,50 @@
             openLightbox(index);
         });
 
-        const info = document.createElement("div");
-        info.className = "album-info";
-
-        const title = document.createElement("h3");
-        title.textContent = photo.title || "未命名照片";
-
-        const desc = document.createElement("p");
-        desc.textContent = photo.description || "";
-
-        const meta = document.createElement("p");
-        meta.className = "album-meta";
-
-        const metaParts = [];
-        if (photo.location) {
-            metaParts.push(`地点：${photo.location}`);
-        }
-
-        const shotAt = formatShotDate(photo.shot_at);
-        if (shotAt) {
-            metaParts.push(`拍摄时间：${shotAt}`);
-        }
-
-        if (isAdminUser() && !photo.is_visible) {
-            metaParts.push("状态：已隐藏");
-        }
-
-        meta.textContent = metaParts.join(" | ");
-
-        info.appendChild(title);
-        if (photo.description) {
-            info.appendChild(desc);
-        }
-        if (metaParts.length) {
-            info.appendChild(meta);
-        }
-
         card.appendChild(imageButton);
-        card.appendChild(info);
+
+        if (isAdminUser()) {
+            const info = document.createElement("div");
+            info.className = "album-info";
+
+            const displayTitle = resolveDisplayTitle(photo.title);
+            if (displayTitle) {
+                const title = document.createElement("h3");
+                title.textContent = displayTitle;
+                info.appendChild(title);
+            }
+
+            if (photo.description) {
+                const desc = document.createElement("p");
+                desc.textContent = photo.description;
+                info.appendChild(desc);
+            }
+
+            const metaParts = [];
+            if (photo.location) {
+                metaParts.push(`地点：${photo.location}`);
+            }
+
+            const shotAt = formatShotDate(photo.shot_at);
+            if (shotAt) {
+                metaParts.push(`拍摄时间：${shotAt}`);
+            }
+
+            if (!photo.is_visible) {
+                metaParts.push("状态：已隐藏");
+            }
+
+            if (metaParts.length > 0) {
+                const meta = document.createElement("p");
+                meta.className = "album-meta";
+                meta.textContent = metaParts.join(" | ");
+                info.appendChild(meta);
+            }
+
+            if (info.childNodes.length > 0) {
+                card.appendChild(info);
+            }
+        }
 
         if (isAdminUser()) {
             const actions = document.createElement("div");
@@ -580,9 +671,11 @@
         }
 
         const current = state.photoRows[state.lightboxIndex];
+        const displayTitle = resolveDisplayTitle(current.row.title);
         albumLightboxImage.src = current.publicUrl;
         albumLightboxImage.alt = current.row.title || "相册预览";
-        albumLightboxTitle.textContent = current.row.title || "未命名照片";
+        albumLightboxTitle.textContent = displayTitle;
+        albumLightboxTitle.hidden = !displayTitle;
         albumLightboxCounter.textContent = `${state.lightboxIndex + 1} / ${total}`;
     }
 
@@ -654,6 +747,12 @@
             if (albumCollectionSelect) {
                 albumCollectionSelect.value = "";
             }
+            if (albumCollectionField) {
+                albumCollectionField.hidden = false;
+            }
+            if (albumCollectionIdHidden) {
+                albumCollectionIdHidden.value = "";
+            }
             await renderCollectionsHome();
             return;
         }
@@ -672,6 +771,12 @@
         if (albumCollectionSelect) {
             albumCollectionSelect.value = collectionInUrl;
         }
+        if (albumCollectionField) {
+            albumCollectionField.hidden = true;
+        }
+        if (albumCollectionIdHidden) {
+            albumCollectionIdHidden.value = collectionInUrl;
+        }
 
         if (albumCurrentCollectionName) {
             albumCurrentCollectionName.textContent = currentCollection.name || "相册详情";
@@ -680,7 +785,14 @@
             albumDetailTitle.textContent = currentCollection.name || "相册详情";
         }
         if (albumDetailDescription) {
-            albumDetailDescription.textContent = currentCollection.description || "";
+            const detailText = (currentCollection.description || "").trim();
+            if (detailText) {
+                albumDetailDescription.textContent = detailText;
+                albumDetailDescription.hidden = false;
+            } else {
+                albumDetailDescription.textContent = "";
+                albumDetailDescription.hidden = true;
+            }
         }
 
         await loadCollectionPhotos(collectionInUrl);
@@ -701,15 +813,9 @@
 
         const name = collectionName ? collectionName.value.trim() : "";
         const description = collectionDescription ? collectionDescription.value.trim() : "";
-        const sortOrder = Number.parseInt(collectionSortOrder ? collectionSortOrder.value : "0", 10);
 
         if (!name) {
             setStatus(albumCollectionStatus, "相册集名称不能为空。", true);
-            return;
-        }
-
-        if (Number.isNaN(sortOrder)) {
-            setStatus(albumCollectionStatus, "展示顺序必须是整数。", true);
             return;
         }
 
@@ -724,6 +830,8 @@
                 setStatus(albumCollectionStatus, "当前用户未登录，请先登录管理员账号。", true);
                 return;
             }
+
+            const sortOrder = await getNextCollectionSortOrder();
 
             const { error } = await supabaseClient
                 .from("album_collections")
@@ -742,9 +850,6 @@
             }
 
             albumCollectionForm.reset();
-            if (collectionSortOrder) {
-                collectionSortOrder.value = "0";
-            }
             if (collectionVisible) {
                 collectionVisible.checked = true;
             }
@@ -774,7 +879,6 @@
         editCollectionId.value = collection.id;
         editCollectionName.value = collection.name || "";
         editCollectionDescription.value = collection.description || "";
-        editCollectionSortOrder.value = String(collection.sort_order ?? 0);
         editCollectionVisible.checked = Boolean(collection.is_visible);
         setStatus(albumCollectionEditStatus, "", false);
 
@@ -792,7 +896,6 @@
         const id = editCollectionId.value;
         const name = editCollectionName.value.trim();
         const description = editCollectionDescription.value.trim();
-        const sortOrder = Number.parseInt(editCollectionSortOrder.value, 10);
 
         if (!isUuid(id)) {
             setStatus(albumCollectionEditStatus, "相册集参数无效。", true);
@@ -804,18 +907,12 @@
             return;
         }
 
-        if (Number.isNaN(sortOrder)) {
-            setStatus(albumCollectionEditStatus, "展示顺序必须是整数。", true);
-            return;
-        }
-
         try {
             const { error } = await supabaseClient
                 .from("album_collections")
                 .update({
                     name,
                     description,
-                    sort_order: sortOrder,
                     is_visible: Boolean(editCollectionVisible.checked),
                     updated_at: new Date().toISOString()
                 })
@@ -905,15 +1002,12 @@
             return;
         }
 
-        const file = albumFile && albumFile.files ? albumFile.files[0] : null;
-        const collectionId = albumCollectionSelect ? albumCollectionSelect.value : "";
-        const title = albumTitle ? albumTitle.value.trim() : "";
-        const description = albumDescription ? albumDescription.value.trim() : "";
-        const location = albumLocation ? albumLocation.value.trim() : "";
-        const shotAt = albumShotAt ? albumShotAt.value : "";
-        const sortOrder = Number.parseInt(albumSortOrder ? albumSortOrder.value : "0", 10);
+        const files = albumFile && albumFile.files
+            ? Array.from(albumFile.files)
+            : [];
+        const collectionId = getSelectedUploadCollectionId();
 
-        if (!file) {
+        if (!files.length) {
             setStatus(albumAdminStatus, "请先选择照片文件。", true);
             return;
         }
@@ -923,31 +1017,19 @@
             return;
         }
 
-        if (!title) {
-            setStatus(albumAdminStatus, "标题不能为空。", true);
-            return;
-        }
+        const selectedCollection = getCollectionById(collectionId);
+        const targetCollectionName = selectedCollection?.name || "目标";
+        const confirmText = files.length === 1
+            ? `确定将这张照片上传到「${targetCollectionName}」相册吗？`
+            : `确定将 ${files.length} 张照片上传到「${targetCollectionName}」相册吗？`;
 
-        if (!ALLOWED_TYPES.includes(file.type)) {
-            setStatus(albumAdminStatus, "仅支持 JPEG、PNG、WEBP 图片。", true);
-            return;
-        }
-
-        if (file.size > MAX_FILE_SIZE) {
-            setStatus(albumAdminStatus, "图片大小不能超过 5MB。", true);
-            return;
-        }
-
-        if (Number.isNaN(sortOrder)) {
-            setStatus(albumAdminStatus, "展示顺序必须是整数。", true);
+        if (!window.confirm(confirmText)) {
             return;
         }
 
         albumUploadButton.disabled = true;
         albumUploadButton.textContent = "上传中...";
         setStatus(albumAdminStatus, "正在上传照片...", false);
-
-        let uploadedPath = "";
 
         try {
             const { data: userData, error: userError } = await supabaseClient.auth.getUser();
@@ -957,81 +1039,91 @@
                 return;
             }
 
-            const extension = getFileExtension(file);
-            const filename = `${Date.now()}-${createUuid()}.${extension}`;
-            uploadedPath = `${userData.user.id}/${collectionId}/${filename}`;
+            let nextSortOrder = await getNextPhotoSortOrder(collectionId);
+            let successCount = 0;
+            let failCount = 0;
 
-            const { error: uploadError } = await supabaseClient.storage
-                .from(ALBUM_BUCKET)
-                .upload(uploadedPath, file, {
-                    cacheControl: "3600",
-                    upsert: false,
-                    contentType: file.type
-                });
-
-            if (uploadError) {
-                console.error("上传文件失败：", uploadError);
-                setStatus(albumAdminStatus, "上传失败：图片文件上传失败。", true);
-                return;
-            }
-
-            const { error: insertError } = await supabaseClient
-                .from("album_photos")
-                .insert([
-                    {
-                        collection_id: collectionId,
-                        title,
-                        description,
-                        image_path: uploadedPath,
-                        location,
-                        shot_at: shotAt || null,
-                        sort_order: sortOrder,
-                        is_visible: Boolean(albumVisible && albumVisible.checked),
-                        created_by: userData.user.id
-                    }
-                ]);
-
-            if (insertError) {
-                console.error("写入照片记录失败：", insertError);
-
-                const { error: rollbackError } = await supabaseClient.storage
-                    .from(ALBUM_BUCKET)
-                    .remove([uploadedPath]);
-
-                if (rollbackError) {
-                    console.error("回滚上传文件失败：", rollbackError);
+            for (const file of files) {
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    failCount += 1;
+                    continue;
                 }
 
-                setStatus(albumAdminStatus, "数据库保存失败，已尝试回滚上传文件。", true);
-                return;
+                if (file.size > MAX_FILE_SIZE) {
+                    failCount += 1;
+                    continue;
+                }
+
+                const extension = getFileExtension(file);
+                const filename = `${Date.now()}-${createUuid()}.${extension}`;
+                const uploadPath = `${userData.user.id}/${collectionId}/${filename}`;
+
+                const { error: uploadError } = await supabaseClient.storage
+                    .from(ALBUM_BUCKET)
+                    .upload(uploadPath, file, {
+                        cacheControl: "3600",
+                        upsert: false,
+                        contentType: file.type
+                    });
+
+                if (uploadError) {
+                    console.error("上传文件失败：", uploadError);
+                    failCount += 1;
+                    continue;
+                }
+
+                const { error: insertError } = await supabaseClient
+                    .from("album_photos")
+                    .insert([
+                        {
+                            collection_id: collectionId,
+                            title: extractTitleFromFilename(file.name),
+                            description: "",
+                            image_path: uploadPath,
+                            location: "",
+                            shot_at: null,
+                            sort_order: nextSortOrder,
+                            is_visible: true,
+                            created_by: userData.user.id
+                        }
+                    ]);
+
+                if (insertError) {
+                    console.error("写入照片记录失败：", insertError);
+                    failCount += 1;
+
+                    const { error: rollbackError } = await supabaseClient.storage
+                        .from(ALBUM_BUCKET)
+                        .remove([uploadPath]);
+
+                    if (rollbackError) {
+                        console.error("回滚上传文件失败：", rollbackError);
+                    }
+
+                    continue;
+                }
+
+                successCount += 1;
+                nextSortOrder += 1;
             }
 
-            albumUploadForm.reset();
-            if (albumSortOrder) {
-                albumSortOrder.value = "0";
-            }
-            if (albumVisible) {
-                albumVisible.checked = true;
-            }
-            if (albumCollectionSelect) {
-                albumCollectionSelect.value = state.currentCollectionId || "";
+            if (successCount > 0 && failCount === 0) {
+                setStatus(albumAdminStatus, `成功上传 ${successCount} 张照片。`, false);
+            } else if (successCount > 0) {
+                setStatus(albumAdminStatus, `成功上传 ${successCount} 张，失败 ${failCount} 张。`, true);
+            } else {
+                setStatus(albumAdminStatus, `上传失败，共失败 ${failCount} 张。`, true);
             }
 
-            setStatus(albumAdminStatus, "上传成功。", false);
+            if (albumFile) {
+                albumFile.value = "";
+            }
+
             await fetchCollections();
             prepareAdminForms();
             await refreshByRoute();
         } catch (error) {
             console.error("上传失败：", error);
-            if (uploadedPath) {
-                try {
-                    await supabaseClient.storage
-                        .from(ALBUM_BUCKET)
-                        .remove([uploadedPath]);
-                } catch (rollbackError) {
-                    console.error("异常回滚失败：", rollbackError);
-                }
-            }
             setStatus(albumAdminStatus, "上传失败，请稍后重试。", true);
         } finally {
             albumUploadButton.disabled = false;
