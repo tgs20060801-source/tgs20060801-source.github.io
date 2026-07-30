@@ -1724,7 +1724,8 @@ body.dark-mode #logoutButton:hover {
 
 #authEmail,
 #authPassword,
-#authNickname {
+#authNickname,
+#authPasswordConfirm {
     padding-left: 14px;
     padding-right: 14px;
 }

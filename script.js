@@ -119,6 +119,50 @@ function showMessage() {
     window.location.href = "about.html";
 }
 
+const AUTH_PASSWORD_CONFIRM_EMPTY_MESSAGE = "请再次输入密码。";
+const AUTH_PASSWORD_MISMATCH_MESSAGE = "两次输入的密码不一致，请重新输入。";
+
+function clearAuthMismatchMessage() {
+    const message = document.getElementById("authMessage");
+
+    if (message && message.textContent === AUTH_PASSWORD_MISMATCH_MESSAGE) {
+        message.textContent = "";
+    }
+}
+
+function validateRegisterPasswordConfirmation() {
+    if (authMode !== "register") {
+        return true;
+    }
+
+    const message = document.getElementById("authMessage");
+    const confirmPasswordInput = document.getElementById("authPasswordConfirm");
+    const passwordInput = document.getElementById("authPassword");
+
+    if (!message || !confirmPasswordInput || !passwordInput) {
+        return false;
+    }
+
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (!confirmPassword) {
+        message.textContent = AUTH_PASSWORD_CONFIRM_EMPTY_MESSAGE;
+        confirmPasswordInput.value = "";
+        confirmPasswordInput.focus();
+        return false;
+    }
+
+    if (password !== confirmPassword) {
+        message.textContent = AUTH_PASSWORD_MISMATCH_MESSAGE;
+        confirmPasswordInput.value = "";
+        confirmPasswordInput.focus();
+        return false;
+    }
+
+    return true;
+}
+
 function getAuthInput() {
     const nicknameInput = document.getElementById("authNickname");
     const emailInput = document.getElementById("authEmail");
@@ -165,8 +209,10 @@ function setAuthMode(mode) {
     const authSwitchButton = document.getElementById("authSwitchButton");
     const authSwitchPrefix = document.getElementById("authSwitchPrefix");
     const authNicknameField = document.getElementById("authNicknameField");
+    const authPasswordConfirmField = document.getElementById("authPasswordConfirmField");
     const nicknameInput = document.getElementById("authNickname");
     const passwordInput = document.getElementById("authPassword");
+    const passwordConfirmInput = document.getElementById("authPasswordConfirm");
     const message = document.getElementById("authMessage");
 
     if (authTitle) {
@@ -198,9 +244,21 @@ function setAuthMode(mode) {
         nicknameInput.required = nextMode === "register";
     }
 
+    if (authPasswordConfirmField) {
+        authPasswordConfirmField.hidden = nextMode !== "register";
+    }
+
+    if (passwordConfirmInput) {
+        passwordConfirmInput.required = nextMode === "register";
+        passwordConfirmInput.hidden = nextMode !== "register";
+        passwordConfirmInput.value = "";
+        passwordConfirmInput.autocomplete = "new-password";
+    }
+
     if (passwordInput) {
         passwordInput.value = "";
         passwordInput.placeholder = nextMode === "register" ? "请设置至少 6 位密码" : "请输入密码";
+        passwordInput.autocomplete = nextMode === "register" ? "new-password" : "current-password";
     }
 
     if (message) {
@@ -219,6 +277,9 @@ async function handleAuthSubmit(event) {
 
     try {
         if (authMode === "register") {
+            if (!validateRegisterPasswordConfirmation()) {
+                return;
+            }
             await registerUser();
         } else {
             await loginUser();
@@ -242,6 +303,10 @@ async function registerUser() {
     const input = getAuthInput();
 
     if (!input) {
+        return;
+    }
+
+    if (!validateRegisterPasswordConfirmation()) {
         return;
     }
 
@@ -969,6 +1034,15 @@ if (supabaseClient && document.getElementById("authEmail")) {
 const authForm = document.getElementById("authForm");
 if (authForm) {
     authForm.addEventListener("submit", handleAuthSubmit);
+
+    const authPasswordInput = document.getElementById("authPassword");
+    const authPasswordConfirmInput = document.getElementById("authPasswordConfirm");
+    if (authPasswordInput) {
+        authPasswordInput.addEventListener("input", clearAuthMismatchMessage);
+    }
+    if (authPasswordConfirmInput) {
+        authPasswordConfirmInput.addEventListener("input", clearAuthMismatchMessage);
+    }
 
     const authSwitchButton = document.getElementById("authSwitchButton");
     if (authSwitchButton) {
