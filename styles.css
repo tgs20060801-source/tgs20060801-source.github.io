@@ -1666,3 +1666,139 @@ body.dark-mode #logoutButton:hover {
         align-items: flex-start;
     }
 }
+
+.auth-page {
+    width: 100%;
+    max-width: none;
+    margin: 40px auto 100px;
+    padding: 0 12px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.auth-card {
+    width: min(100%, 480px);
+    margin: 0 auto;
+    padding: 32px 30px 28px;
+    border-radius: 20px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 12px 34px var(--shadow-color);
+    text-align: left;
+}
+
+.auth-header {
+    margin-bottom: 18px;
+}
+
+.auth-title {
+    margin: 0;
+    font-size: 30px;
+    color: var(--text-color);
+}
+
+.auth-subtitle {
+    margin: 8px 0 0;
+    color: var(--muted-color);
+    font-size: 15px;
+}
+
+.auth-field {
+    margin-bottom: 12px;
+}
+
+.auth-nickname-field[hidden] {
+    display: none;
+}
+
+#authForm {
+    display: grid;
+    gap: 0;
+}
+
+#authForm input {
+    margin: 0;
+    height: 48px;
+    border-radius: 12px;
+}
+
+#authEmail,
+#authPassword,
+#authNickname {
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.auth-primary-button {
+    width: 100%;
+    margin-top: 4px;
+    height: 48px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.auth-primary-button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+.auth-switch-text {
+    margin: 14px 0 0;
+    color: var(--muted-color);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.auth-switch-button {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-switch-button:hover {
+    background: transparent;
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.auth-switch-button:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.auth [hidden],
+.auth-card [hidden],
+#authForm[hidden],
+#authUserPanel[hidden] {
+    display: none !important;
+}
+
+#authMessage {
+    min-height: 24px;
+    margin-top: 14px;
+    font-size: 14px;
+}
+
+@media (max-width: 700px) {
+    .auth-page {
+        margin: 24px auto 60px;
+        padding: 0 12px;
+    }
+
+    .auth-card {
+        width: 100%;
+        padding: 24px 18px 20px;
+        border-radius: 18px;
+    }
+
+    .auth-title {
+        font-size: 26px;
+    }
+}

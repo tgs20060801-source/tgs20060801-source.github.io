@@ -153,6 +153,83 @@ function getAuthInput() {
     };
 }
 
+let authMode = "login";
+
+function setAuthMode(mode) {
+    const nextMode = mode === "register" ? "register" : "login";
+    authMode = nextMode;
+
+    const authTitle = document.getElementById("authTitle");
+    const authSubtitle = document.getElementById("authSubtitle");
+    const authPrimaryButton = document.getElementById("authPrimaryButton");
+    const authSwitchButton = document.getElementById("authSwitchButton");
+    const authSwitchPrefix = document.getElementById("authSwitchPrefix");
+    const authNicknameField = document.getElementById("authNicknameField");
+    const nicknameInput = document.getElementById("authNickname");
+    const passwordInput = document.getElementById("authPassword");
+    const message = document.getElementById("authMessage");
+
+    if (authTitle) {
+        authTitle.textContent = nextMode === "register" ? "创建账号" : "欢迎回来";
+    }
+
+    if (authSubtitle) {
+        authSubtitle.textContent = nextMode === "register" ? "填写信息完成注册" : "登录后进入用户中心";
+    }
+
+    if (authPrimaryButton) {
+        authPrimaryButton.textContent = nextMode === "register" ? "注册" : "登录";
+        authPrimaryButton.disabled = false;
+    }
+
+    if (authSwitchButton) {
+        authSwitchButton.textContent = nextMode === "register" ? "返回登录" : "立即注册";
+    }
+
+    if (authSwitchPrefix) {
+        authSwitchPrefix.textContent = nextMode === "register" ? "已有账号？" : "还没有账号？";
+    }
+
+    if (authNicknameField) {
+        authNicknameField.hidden = nextMode !== "register";
+    }
+
+    if (nicknameInput) {
+        nicknameInput.required = nextMode === "register";
+    }
+
+    if (passwordInput) {
+        passwordInput.value = "";
+        passwordInput.placeholder = nextMode === "register" ? "请设置至少 6 位密码" : "请输入密码";
+    }
+
+    if (message) {
+        message.textContent = "";
+    }
+}
+
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+
+    const primaryButton = document.getElementById("authPrimaryButton");
+
+    if (primaryButton) {
+        primaryButton.disabled = true;
+    }
+
+    try {
+        if (authMode === "register") {
+            await registerUser();
+        } else {
+            await loginUser();
+        }
+    } finally {
+        if (primaryButton) {
+            primaryButton.disabled = false;
+        }
+    }
+}
+
 async function registerUser() {
     if (!supabaseClient) {
         const message = document.getElementById("authMessage");
@@ -312,6 +389,7 @@ async function logoutUser() {
             return;
         }
 
+        setAuthMode("login");
         await updateAuthStatus();
         if (message) {
             message.textContent = "已经退出登录。";
@@ -369,16 +447,21 @@ async function updateAuthStatus() {
 
         authForm.hidden = true;
         authUserPanel.hidden = false;
+        const authPassword = document.getElementById("authPassword");
+        if (authPassword) {
+            authPassword.value = "";
+        }
         if (authCurrentNickname) {
             authCurrentNickname.textContent = nickname;
         }
         if (authCurrentEmail) {
             authCurrentEmail.textContent = email;
         }
-        message.textContent = "当前已登录：" + email;
+        message.textContent = "";
     } else {
         authForm.hidden = false;
         authUserPanel.hidden = true;
+        setAuthMode("login");
         message.textContent = "";
     }
 }
@@ -881,6 +964,20 @@ if (supabaseClient && document.getElementById("authEmail")) {
     });
 
     updateAuthStatus();
+}
+
+const authForm = document.getElementById("authForm");
+if (authForm) {
+    authForm.addEventListener("submit", handleAuthSubmit);
+
+    const authSwitchButton = document.getElementById("authSwitchButton");
+    if (authSwitchButton) {
+        authSwitchButton.addEventListener("click", () => {
+            setAuthMode(authMode === "register" ? "login" : "register");
+        });
+    }
+
+    setAuthMode("login");
 }
 
 const commentForm = document.getElementById("commentForm");
